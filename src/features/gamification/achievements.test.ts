@@ -61,3 +61,12 @@ describe('evaluateAchievements', () => {
     expect(evaluateAchievements(base({ league: { tier: 2, weekStart: '', weekXp: 0, standings: [], lastResult: null } }), 1).achievements.league.level).toBe(2)
   })
 })
+
+import { singularize } from './achievements'
+describe('singularize', () => {
+  it('ajusta plurales cuando el objetivo es 1', () => {
+    expect(singularize('Completá 1 lecciones')).toBe('Completá 1 lección')
+    expect(singularize('Hacé 1 lecciones perfectas')).toBe('Hacé 1 lección perfecta')
+    expect(singularize('Completá 10 lecciones')).toBe('Completá 10 lecciones')
+  })
+})

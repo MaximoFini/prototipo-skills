@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { Exercise, RunnerResult } from '@/domain/types'
-import { Button, FlameIcon, HeartIcon, Modal, ProgressBar } from '@/design'
+import { Button, HeartIcon, Modal, ProgressBar } from '@/design'
 import { useApp } from '@/store/useApp'
 import { now } from '@/domain/clock'
 import { sfx } from '@/lib/sfx'
@@ -41,8 +41,6 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
   const [message, setMessage] = useState('')
   const [confirmExit, setConfirmExit] = useState(false)
-  const [banner, setBanner] = useState<number | null>(null)
-  const bannerTimer = useRef<ReturnType<typeof setTimeout>>()
   const [heartHit, setHeartHit] = useState(0)
 
   const item = currentItem(state)
@@ -59,8 +57,6 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status])
 
-  useEffect(() => () => clearTimeout(bannerTimer.current), [])
-
   const proceed = useCallback(() => {
     setAnswer(null)
     setEvaluation(null)
@@ -76,15 +72,9 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
     if (ev.correct) {
       sfx.correct()
       const run = state.streak + 1
-      if (run >= 3) {
-        setBanner(run)
-        window.setTimeout(() => sfx.streak(), 250)
-        clearTimeout(bannerTimer.current)
-        bannerTimer.current = setTimeout(() => setBanner(null), 1800)
-      }
+      if (run >= 3) window.setTimeout(() => sfx.streak(), 250)
     } else {
       sfx.wrong()
-      setBanner(null)
       if (consumesHearts && useApp.getState().hearts > 0) {
         useApp.getState().loseHeart()
         setHeartHit((n) => n + 1)
@@ -135,18 +125,6 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
         )}
       </div>
 
-      {/* Racha de aciertos */}
-      <AnimatePresence>
-        {banner !== null && (
-          <motion.div key="streak" className="pointer-events-none absolute inset-x-0 top-[68px] z-10 flex justify-center"
-            initial={{ opacity: 0, y: reduce ? 0 : -12, scale: reduce ? 1 : 0.8 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
-            <span role="status" className="inline-flex items-center gap-1.5 rounded-full bg-go-text px-4 py-1.5 font-display text-[16px] font-extrabold text-white shadow-lg">
-              <FlameIcon size={20} /> ¡{banner} seguidas!
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Ejercicio */}
       <div className={`scroll-y flex-1 px-4 pt-4 ${feedback && showFeedback ? 'pb-72' : 'pb-8'}`}>
         {item && (
@@ -170,7 +148,7 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
       {/* Panel de feedback */}
       <AnimatePresence>
         {feedback && showFeedback && evaluation && item && (
-          <FeedbackPanel key="fb" evaluation={evaluation} message={message} explanation={item.ex.explanation} extra={extra} onContinue={proceed} />
+          <FeedbackPanel key="fb" evaluation={evaluation} message={message} explanation={item.ex.explanation} extra={extra} streak={state.streak} onContinue={proceed} />
         )}
       </AnimatePresence>
 

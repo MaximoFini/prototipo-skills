@@ -29,7 +29,7 @@ export default function CampaignPage() {
               <XAxis dataKey="hito" tick={{ fontSize: 12, fill: '#4A4441' }} tickLine={false} axisLine={{ stroke: C.grid }} />
               <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 12, fill: '#4A4441' }} tickLine={false} axisLine={false} />
               <Tooltip cursor={{ fill: '#F5F2F0' }} formatter={(v: number, _n, p) => [`${v} % (${(p.payload as { alumnos: number }).alumnos} alumnos)`, 'Llegaron']} />
-              <Bar dataKey="pct" name="% de inscriptos" fill={C.green} radius={[4, 4, 0, 0]} maxBarSize={80} label={{ position: 'top', fontSize: 12, fill: '#1B1B1B', formatter: (v: number) => `${v} %` }} />
+              <Bar isAnimationActive={false} dataKey="pct" name="% de inscriptos" fill={C.green} radius={[4, 4, 0, 0]} maxBarSize={80} label={{ position: 'top', fontSize: 12, fill: '#1B1B1B', formatter: (v: number) => `${v} %` }} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

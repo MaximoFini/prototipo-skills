@@ -36,7 +36,7 @@ export function ActivityChart({ data }: { data: DayPoint[] }) {
           <XAxis dataKey="label" tick={axis} interval={4} tickLine={false} axisLine={{ stroke: C.grid }} />
           <YAxis tick={axis} tickLine={false} axisLine={false} allowDecimals={false} />
           <Tooltip {...tip} formatter={(v: number) => [`${v} alumnos`, 'Activos']} labelFormatter={(l: string) => `Día ${l}`} />
-          <Area type="monotone" dataKey="active" name="Alumnos activos" stroke={C.green} strokeWidth={2} fill={C.green} fillOpacity={0.14} activeDot={{ r: 5, stroke: '#fff', strokeWidth: 2 }} />
+          <Area isAnimationActive={false} type="monotone" dataKey="active" name="Alumnos activos" stroke={C.green} strokeWidth={2} fill={C.green} fillOpacity={0.14} activeDot={{ r: 5, stroke: '#fff', strokeWidth: 2 }} />
         </AreaChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -50,9 +50,9 @@ export function CommissionChart({ data }: { data: GroupStats[] }) {
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 4 }}>
           <CartesianGrid stroke={C.grid} horizontal={false} />
           <XAxis type="number" domain={[0, 100]} unit="%" tick={axis} tickLine={false} axisLine={{ stroke: C.grid }} />
-          <YAxis type="category" dataKey="name" width={80} tick={axis} tickLine={false} axisLine={false} />
+          <YAxis type="category" dataKey="name" width={92} tick={axis} tickLine={false} axisLine={false} />
           <Tooltip {...tip} cursor={{ fill: '#F5F2F0' }} formatter={(v: number) => [`${v} %`, 'Activos en la semana']} />
-          <Bar dataKey="activeWeekPct" name="% activos en la semana" fill={C.green} radius={[0, 4, 4, 0]} maxBarSize={20} />
+          <Bar isAnimationActive={false} dataKey="activeWeekPct" name="% activos en la semana" fill={C.green} radius={[0, 4, 4, 0]} maxBarSize={20} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -68,7 +68,7 @@ export function StreakHistogram({ data }: { data: { label: string; alumnos: numb
           <XAxis dataKey="label" tick={axis} tickLine={false} axisLine={{ stroke: C.grid }} label={{ value: 'Días de racha', position: 'insideBottom', offset: -10, style: axis }} />
           <YAxis tick={axis} tickLine={false} axisLine={false} allowDecimals={false} />
           <Tooltip {...tip} cursor={{ fill: '#F5F2F0' }} formatter={(v: number) => [`${v} alumnos`, 'Alumnos']} labelFormatter={(l: string) => `Racha de ${l} días`} />
-          <Bar dataKey="alumnos" name="Alumnos" fill={C.green} radius={[4, 4, 0, 0]} />
+          <Bar isAnimationActive={false} dataKey="alumnos" name="Alumnos" fill={C.green} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -82,11 +82,11 @@ export function RetentionChart() {
         <LineChart data={retentionSeries} margin={{ top: 8, right: 16, bottom: 0, left: -8 }}>
           <CartesianGrid stroke={C.grid} vertical={false} />
           <XAxis dataKey="semana" tick={axis} tickLine={false} axisLine={{ stroke: C.grid }} />
-          <YAxis domain={[50, 100]} unit="%" tick={axis} tickLine={false} axisLine={false} />
+          <YAxis domain={[50, 100]} ticks={[50, 60, 70, 80, 90, 100]} unit="%" tick={axis} tickLine={false} axisLine={false} />
           <Tooltip {...tip} formatter={(v: number, n: string) => [`${v} %`, n]} />
           <Legend verticalAlign="top" height={30} iconType="plainline" wrapperStyle={{ fontSize: 13 }} />
-          <Line type="monotone" dataKey="conApp" name="Con Skills Go" stroke={C.green} strokeWidth={3} dot={{ r: 4, fill: C.green, stroke: '#fff', strokeWidth: 2 }} />
-          <Line type="monotone" dataKey="anioAnterior" name="Año anterior (sin app)" stroke={C.gray} strokeWidth={2} strokeDasharray="6 4" dot={{ r: 4, fill: C.gray, stroke: '#fff', strokeWidth: 2 }} />
+          <Line isAnimationActive={false} type="monotone" dataKey="conApp" name="Con Skills Go" stroke={C.green} strokeWidth={3} dot={{ r: 4, fill: C.green, stroke: '#fff', strokeWidth: 2 }} />
+          <Line isAnimationActive={false} type="monotone" dataKey="anioAnterior" name="Año anterior (sin app)" stroke={C.gray} strokeWidth={2} strokeDasharray="6 4" dot={{ r: 4, fill: C.gray, stroke: '#fff', strokeWidth: 2 }} />
         </LineChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -101,7 +101,7 @@ export function CompareBars({ data, dataKey, name, unit = '' }: { data: { name: 
         <XAxis type="number" unit={unit} tick={axis} tickLine={false} axisLine={{ stroke: C.grid }} />
         <YAxis type="category" dataKey="name" width={110} tick={axis} tickLine={false} axisLine={false} />
         <Tooltip {...tip} cursor={{ fill: '#F5F2F0' }} formatter={(v: number) => [`${v}${unit}`, name]} />
-        <Bar dataKey={dataKey} name={name} fill={C.green} radius={[0, 4, 4, 0]} maxBarSize={18} />
+        <Bar isAnimationActive={false} dataKey={dataKey} name={name} fill={C.green} radius={[0, 4, 4, 0]} maxBarSize={18} />
       </BarChart>
     </ResponsiveContainer>
   )

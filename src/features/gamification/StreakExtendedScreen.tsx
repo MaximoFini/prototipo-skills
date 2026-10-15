@@ -4,7 +4,7 @@ import { Snowflake } from 'lucide-react'
 import { Button, CheckIcon, FlameIcon, Skilly } from '@/design'
 import type { SkillyMood } from '@/design'
 import { useApp } from '@/store/useApp'
-import { addDays, today, weekStart } from '@/domain/clock'
+import { addDays, diffDays, today, weekStart } from '@/domain/clock'
 import { sfx } from '@/lib/sfx'
 import { celebrate } from '@/lib/confetti'
 
@@ -66,8 +66,9 @@ export function StreakExtendedScreen({ streak, onContinue }: StreakExtendedScree
           <div className="flex justify-between">
             {week.map((d, i) => {
               const isToday = d === t
-              const practiced = days.includes(d) || (isToday && streak > 0)
-              const isFrozen = !practiced && frozen.includes(d)
+              const isFrozen = !days.includes(d) && frozen.includes(d)
+              // una racha de N días implica los N días hasta hoy practicados (o congelados)
+              const practiced = !isFrozen && (days.includes(d) || (d <= t && diffDays(d, t) < streak))
               return (
                 <div key={d} className="flex flex-col items-center gap-1.5">
                   <span className={`text-[13px] font-extrabold ${isToday ? 'text-go-primary' : 'text-go-muted'}`}>{LETTERS[i]}</span>

@@ -4,7 +4,7 @@ import { BoltIcon, ChestIcon, CheckIcon, FlameIcon, GemIcon, LockIcon, ProgressB
 import { ACHIEVEMENTS, MEDALS, type AchievementDef, type AchievementIcon } from '@/data/achievements'
 import { useApp } from '@/store/useApp'
 import type { UserState } from '@/domain/types'
-import { metricValue, nextProgress } from './achievements'
+import { metricValue, nextProgress, singularize } from './achievements'
 
 const MEDAL_STYLE = [
   { bg: '#D8CFCC', ring: '#B5ABA6', text: '#6B6360' },
@@ -59,7 +59,7 @@ function Row({ def, s }: { def: AchievementDef; s: UserState }) {
             {locked ? 'Bloqueado' : MEDALS[level]}
           </span>
         </div>
-        <p className="text-[13px] leading-snug text-go-muted">{def.description.replace('{n}', String(next))}</p>
+        <p className="text-[13px] leading-snug text-go-muted">{singularize(def.description.replace('{n}', String(next)))}</p>
         <div className="mt-1.5 flex items-center gap-2">
           <ProgressBar value={p.pct} height={10} color={maxed ? '#C9A02C' : '#00522E'} />
           <span className="w-[62px] shrink-0 text-right text-[12px] font-bold text-go-muted">{maxed ? 'Al máximo' : `${p.value}/${p.target}`}</span>

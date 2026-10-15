@@ -48,7 +48,7 @@ export default function RiskPage() {
                   <th scope="row" className={`${tdCls} text-left font-medium`}><Link to={`/admin/alumnos/${s.id}`} className="text-go-primary hover:underline">{s.name}</Link></th>
                   <td className={tdCls}>{s.commission}</td>
                   <td className={tdCls}>{s.daysInactive}</td>
-                  <td className={tdCls}>{s.lostStreak > 0 ? `${s.lostStreak} días` : '—'}</td>
+                  <td className={tdCls}>{s.lostStreak > 0 ? `${s.lostStreak} ${s.lostStreak === 1 ? "día" : "días"}` : '—'}</td>
                   <td className={tdCls}>{fmtDate(s.lastActiveDate)}</td>
                   <td className={tdCls}><RiskBadge level={riskLevel(s)} /></td>
                   <td className={tdCls}>

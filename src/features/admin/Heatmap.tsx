@@ -19,7 +19,7 @@ export function Heatmap({ history }: { history: number[] }) {
   const active = history.filter((n) => n > 0).length
   return (
     <figure>
-      <svg viewBox={`0 0 ${w} ${h}`} width="100%" style={{ maxWidth: w * 1.4 }} role="img" aria-label={`Actividad de los últimos ${history.length} días: ${active} días con práctica`}>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" style={{ maxWidth: w * 2 }} role="img" aria-label={`Actividad de los últimos ${history.length} días: ${active} días con práctica`}>
         {DOW.map((l, i) => <text key={l} x={0} y={top + i * (CELL + GAP) + 13} fontSize="11" fill="#4A4441">{l}</text>)}
         {days.map((d, i) => {
           const idx = lead + i

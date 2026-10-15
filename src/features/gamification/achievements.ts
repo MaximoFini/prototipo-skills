@@ -73,3 +73,14 @@ export function evaluateAchievements(s: Evaluable, at: number): { achievements: 
 export function unlockMessage(u: Unlock): string {
   return `${u.def.title} · ${MEDALS[u.level]}`
 }
+
+/** "Completá 1 lecciones" → "Completá 1 lección". Solo toca el texto cuando n === 1. */
+export function singularize(text: string): string {
+  if (!/\b1 /.test(text)) return text
+  const map: [RegExp, string][] = [
+    [/\b1 lecciones perfectas/, '1 lección perfecta'], [/\b1 lecciones/, '1 lección'], [/\b1 misiones/, '1 misión'],
+    [/\b1 días distintos/, '1 día distinto'], [/\b1 días/, '1 día'], [/\b1 veces/, '1 vez'], [/\b1 palabras/, '1 palabra'],
+    [/\b1 ejercicios/, '1 ejercicio'], [/\b1 minutos/, '1 minuto'], [/\b1 gemas/, '1 gema'],
+  ]
+  return map.reduce((t, [re, to]) => t.replace(re, to), text)
+}

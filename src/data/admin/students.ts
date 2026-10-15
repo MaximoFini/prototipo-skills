@@ -60,7 +60,7 @@ function runEndingAt(history: number[], idx: number): number {
 type Archetype = 'constante' | 'regular' | 'esporadico' | 'abandona'
 function makeHistory(rng: Rng, arch: Archetype): number[] {
   const p = arch === 'constante' ? 0.94 : arch === 'regular' ? 0.7 : arch === 'esporadico' ? 0.38 : 0.86
-  const dropAgo = arch === 'abandona' ? rng.int(2, 16) : 0
+  const dropAgo = arch === 'abandona' ? (rng.chance(0.7) ? rng.int(2, 16) : rng.int(17, 40)) : 0
   const h: number[] = []
   for (let i = 0; i < HISTORY_DAYS; i++) {
     const ago = HISTORY_DAYS - 1 - i
