@@ -1,0 +1,39 @@
+@import '@fontsource/gabarito/600.css';
+@import '@fontsource/gabarito/700.css';
+@import '@fontsource/gabarito/800.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: #FFFFFF;
+  color: #1B1B1B;
+  font-family: Roboto, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+button { font-family: inherit; }
+* { box-sizing: border-box; }
+.font-display { font-family: Gabarito, system-ui, sans-serif; }
+
+@layer components {
+  .btn-3d {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-go px-5 py-3 font-display text-[15px] font-extrabold uppercase tracking-[0.05em] transition-transform duration-75 disabled:cursor-not-allowed;
+    border-bottom-width: 4px;
+  }
+  .btn-3d:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 1px; }
+  .card-go { @apply rounded-go border-2 border-go-border bg-white; }
+  .scroll-y { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
