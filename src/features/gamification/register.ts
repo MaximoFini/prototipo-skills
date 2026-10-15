@@ -1,6 +1,12 @@
+import { registerLeague } from '@/features/league/register'
+import { registerVacation } from '@/features/vacation/register'
+
 /**
- * CONTRATO (subagente C). Se importa una vez desde main.tsx. Acá se suscriben (con `on` de '@/domain/events')
- * misiones, logros, liga, desafío de vacaciones y cualquier reacción a 'lesson-finished', 'xp-gained',
- * 'day-changed', etc. También inicializa quests/league si están vacíos.
+ * CONTRATO (subagente C1). Se llama una vez desde main.tsx. Acá se inicializan y suscriben (con `on` de
+ * '@/domain/events') misiones y logros, y se invocan `registerLeague()` y `registerVacation()` (C2).
+ * Reacciona a 'lesson-finished', 'xp-gained', 'day-changed', 'streak-changed'.
  */
-export function registerGamification() {}
+export function registerGamification() {
+  registerLeague()
+  registerVacation()
+}

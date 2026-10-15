@@ -45,20 +45,22 @@ Después del onboarding: si eligió "test de nivel" → `/placement`; luego `/`.
 ## Componentes con contrato (stubs en el repo; el dueño implementa, los demás importan)
 - `features/lesson/LessonRunner` (A): `LessonRunnerProps` (ver archivo). Usado por LessonPage (A), Placement (B), PracticeSession (C).
 - `features/lesson/OutOfHeartsModal` (A): `{open,onClose,onPractice}`. Lo usa PathPage (B) al tocar un nodo con 0 corazones.
-- `features/gamification/StreakExtendedScreen` (C): `{streak,onContinue}`. La usa LessonPage (A) tras el resumen si `summary.streakExtended`.
-- `features/gamification/DailyGoalCelebration` (C): `{goal,onContinue}`. La usa LessonPage (A) si `summary.goalReached`.
-- `features/vacation/VacationBanner` (C): sin props. La usa PathPage (B).
-- `features/notifications/NotificationHost` y `features/demo/DemoPanel` (C): montados en App.
-- `features/gamification/register.ts` (C): `registerGamification()` se llama en `main.tsx`.
+- `features/gamification/StreakExtendedScreen` (C1): `{streak,onContinue}`. La usa LessonPage (A) tras el resumen si `summary.streakExtended`.
+- `features/gamification/DailyGoalCelebration` (C1): `{goal,onContinue}`. La usa LessonPage (A) si `summary.goalReached`.
+- `features/vacation/VacationBanner` (C2): sin props. La usa PathPage (B).
+- `features/notifications/NotificationHost` (C1) y `features/demo/DemoPanel` (C2): montados en App.
+- `features/gamification/register.ts` (C1): `registerGamification()` se llama en `main.tsx` y llama a `registerLeague()` (`features/league/register.ts`, C2) y `registerVacation()` (`features/vacation/register.ts`, C2).
 - Orden del flujo al terminar una lección (LessonPage, A): resumen → (si `goalReached`) DailyGoalCelebration → (si `streakExtended`) StreakExtendedScreen → volver a `/`. Si el alumno se queda sin corazones: `OutOfHeartsModal`.
-- Quién lee qué de gamificación: **C** es dueño de `quests`, `achievements`, `league`, `vacation` dentro del estado (los inicializa en `registerGamification()` y los actualiza escuchando eventos). B y A solo leen.
+- Dueños del estado: **C1** → `quests`, `achievements`; **C2** → `league`, `vacation`. Se inicializan en sus `register*()` y se actualizan escuchando eventos con `useApp.getState().patch(...)`. B y A solo leen.
+- `features/league/register.ts` también exporta `closeLeagueWeek()` (lo usa el panel de demo, C2).
 
 ## Propiedad de archivos
 | Agente | Carpetas / archivos |
 |---|---|
 | A — Motor de lección | `src/features/lesson/**` (LessonPage, LessonRunner, OutOfHeartsModal, componentes de cada ejercicio, LessonResultScreen), `src/features/results/**` |
 | B — Mapa/onboarding/perfil | `src/features/onboarding/**`, `placement/**`, `path/**`, `profile/**`, `friends/**` y `src/data/friends.ts` |
-| C — Gamificación/retención/demo | `src/features/gamification/**`, `league/**`, `vacation/**`, `practice/**`, `notifications/**`, `demo/**`, `src/data/{bots,rewards,achievements}.ts` |
+| C1 — Misiones/logros/tienda/notificaciones | `src/features/gamification/**` (QuestsPage, AchievementsPage, ShopPage, StreakExtendedScreen, DailyGoalCelebration, register.ts), `src/features/notifications/**`, `src/data/achievements.ts` |
+| C2 — Liga/vacaciones/práctica/demo | `src/features/league/**`, `vacation/**`, `practice/**`, `demo/**`, `src/data/{bots,rewards}.ts` |
 | D1 — Contenido A1 | `src/data/levels/a1.ts`, `src/data/levels/placement.ts` |
 | D2 — Contenido A2/B1 | `src/data/levels/a2.ts`, `src/data/levels/b1.ts` |
 | E — Dashboard academia | `src/features/admin/**`, `src/data/admin/**` |
