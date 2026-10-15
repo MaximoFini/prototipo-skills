@@ -1,6 +1,6 @@
 # Planificación — App de práctica tipo Duolingo para Skills (Córdoba Capital)
 
-> Documento vivo. Se actualiza a medida que charlamos. Estado: **BORRADOR v0.2 — decisiones de ronda 1 incorporadas**.
+> Documento vivo. Se actualiza a medida que charlamos. Estado: **BORRADOR v0.3 — nombre y plataforma definidos; falta identidad de marca**.
 > Documento hermano (a crear después): `MANUAL_DE_MARCA.md`.
 
 ---
@@ -131,7 +131,7 @@ Alternativas consideradas:
 
 ## 8. Preguntas abiertas (necesito tu input)
 
-> Ronda 1 respondida (ver sección 10). Quedan pendientes: URLs de web e Instagram de Skills, nombre de la app y plataforma/dispositivo de demo.
+> Ronda 1 respondida (ver sección 10). Resuelto en ronda 2: nombre (Skills Go) y plataforma (PWA). Pendiente: acceso al material de marca (web e Instagram).
 
 <details><summary>Preguntas originales</summary>
 
@@ -173,6 +173,9 @@ Alternativas consideradas:
 | 2026-10-15 | Vidas/corazones **incluidos**; el funcionamiento debe ser un calco de Duolingo | Gráfico y reconocible |
 | 2026-10-15 | Prioridad: velocidad de entrega | Se implementa todo con Claude |
 | 2026-10-15 | Sin desglose de presupuesto en este repo | Lo arma el usuario aparte |
+| 2026-10-15 | Nombre de la app: **Skills Go** | Definido por el usuario |
+| 2026-10-15 | Plataforma: **PWA** (instalable, mobile-first) | Definido por el usuario |
+| 2026-10-15 | Fuentes de marca: skillsedu.com.ar e Instagram @skillsenglishinstitute | Bloqueadas por la red del entorno; pendiente de capturas/logo o abrir dominios |
 | 2026-10-15 | Implementación en una sola pasada con subagentes en paralelo | Ver sección 11 |
 
 ---
