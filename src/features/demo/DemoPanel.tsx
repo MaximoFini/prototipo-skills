@@ -6,7 +6,7 @@ import { useApp } from '@/store/useApp'
 import { HOUR, addDays, now, today } from '@/domain/clock'
 import { HEARTS_MAX, HEART_REGEN_MS } from '@/domain/rules'
 import { allLessons, currentLessonId } from '@/data/content'
-import type { RunnerResult, UserState } from '@/domain/types'
+import type { RunnerResult, UserState, VocabItem } from '@/domain/types'
 import { closeLeagueWeek } from '@/features/league/register'
 import { notifTexts } from './notifTexts'
 import { notificationTemplates as tpl } from '@/features/notifications/templates'
@@ -25,7 +25,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function fmtDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const txt = new Date(ts).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return txt.charAt(0).toUpperCase() + txt.slice(1)
 }
 
 /** Estado "Alumno con 12 días de racha" (Sofi). */
@@ -36,6 +37,8 @@ function sofiProfile(): Partial<UserState> {
   allLessons.slice(0, 6).forEach((l, i) => {
     completed[l.id] = { count: 1 + (i % 2), bestAccuracy: 80 + ((i * 7) % 21), lastAt: now() - (6 - i) * 24 * HOUR }
   })
+  const vocab = new Map<string, VocabItem>()
+  for (const l of allLessons.slice(0, 6)) for (const ex of l.exercises) for (const v of ex.vocab ?? []) vocab.set(v.en.toLowerCase(), v)
   const xpByDay: Record<string, number> = {}
   const per = [60, 85, 70, 55, 90, 75, 40, 80, 65, 70, 100, 50]
   days.forEach((d, i) => { xpByDay[d] = per[i] })
@@ -48,6 +51,7 @@ function sofiProfile(): Partial<UserState> {
     xpByDay,
     streak: { count: 12, best: 12, lastDay: t, freezes: 1, days, frozenDays: [] },
     completed,
+    vocabulary: [...vocab.values()],
     vacation: { joined: true, startDay: addDays(t, -11), ownedRewards: [] },
     stats: { lessonsCompleted: 8, perfectLessons: 3, correct: 62, total: 70, seconds: 1900 },
   }
@@ -138,7 +142,7 @@ export function DemoPanel() {
             <div className="scroll-y relative flex-1 px-4 pb-6">
               <Section title="Tiempo">
                 <p className="col-span-2 rounded-xl bg-go-surface px-3 py-2 text-[13px] text-go-text">
-                  Fecha simulada: <b className="capitalize">{fmtDate(now())}</b>{offset > 0 && <span className="text-go-muted"> (+{Math.round(offset / 86400000)} d)</span>}
+                  Fecha simulada: <b>{fmtDate(now())}</b>{offset > 0 && <span className="text-go-muted"> (+{Math.round(offset / 86400000)} d)</span>}
                 </p>
                 <button type="button" className={sheetBtn} onClick={() => days(1)}>+1 día</button>
                 <button type="button" className={sheetBtn} onClick={() => days(3)}>+3 días</button>
