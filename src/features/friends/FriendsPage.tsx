@@ -60,11 +60,10 @@ function Row({ f, followed, onToggle }: { f: Friend; followed: boolean; onToggle
     <li className="card-go flex items-center gap-3 p-3">
       <Avatar id={f.avatar} name={f.name} size={44} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-display text-[16px] font-extrabold text-go-text">{f.name}</p>
-        <p className="flex items-center gap-3 text-[13px] font-bold text-go-muted">
+        <p className="flex items-baseline gap-2"><span className="truncate font-display text-[16px] font-extrabold text-go-text">{f.name}</span><span className="shrink-0 text-[12px] font-medium text-go-muted">{f.commission}</span></p>
+        <p className="flex items-center gap-3 whitespace-nowrap text-[13px] font-bold">
           <span className="flex items-center gap-0.5 text-go-streak"><FlameIcon size={16} />{f.streak}</span>
           <span className="flex items-center gap-0.5 text-go-xp-dark"><BoltIcon size={16} />{f.weekXp} XP</span>
-          <span className="truncate font-medium">{f.commission}</span>
         </p>
       </div>
       <button

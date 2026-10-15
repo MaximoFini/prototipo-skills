@@ -170,7 +170,7 @@ export default function PathPage() {
                         <span className="h-[3px] flex-1 rounded-full bg-go-border" />
                       </div>
                     )}
-                    <div className="mt-3">
+                    <div className="mb-6 mt-3">
                       <Ribbon tone={it.unit.comingSoon ? 'locked' : 'green'} sub={it.unit.description}>UNIDAD {unitIdx + 1} · {it.unit.title}</Ribbon>
                     </div>
                   </Fragment>

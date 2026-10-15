@@ -17,7 +17,7 @@ export default function StatsPage() {
   const xpByDay = useApp((s) => s.xpByDay)
   const stats = useApp((s) => s.stats)
   const vocab = useApp((s) => s.vocabulary.length)
-  const best = useApp((s) => s.streak.best)
+  const best = useApp((s) => Math.max(s.streak.best, s.streak.count))
   const goal = useApp((s) => s.settings.dailyGoal)
 
   const t = today()

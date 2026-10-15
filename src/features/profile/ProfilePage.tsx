@@ -35,14 +35,14 @@ export default function ProfilePage() {
 
   return (
     <div className="scroll-y h-full">
-      <header className="bg-go-primary px-4 pb-6 text-center text-white" style={{ paddingTop: 'calc(24px + var(--safe-top))' }}>
+      <header className="bg-go-primary px-4 pb-12 text-center text-white" style={{ paddingTop: 'calc(24px + var(--safe-top))' }}>
         <div className="mx-auto w-fit rounded-full bg-white p-1"><Avatar id={profile.avatar} name={profile.name} size={88} /></div>
         <h1 className="mt-3 font-display text-[28px] font-extrabold leading-tight">{profile.name || 'Alumno'}</h1>
         <p className="text-[14px] text-white/90">En Skills desde {MESES[since.getMonth()]} {since.getFullYear()} · {profile.commission}</p>
       </header>
 
       <div className="space-y-5 px-4 py-4">
-        <section aria-label="Resumen" className="-mt-9 grid grid-cols-4 gap-2">
+        <section aria-label="Resumen" className="-mt-10 grid grid-cols-4 gap-2">
           {stats.map((s) => (
             <div key={s.label} className="card-go flex flex-col items-center gap-0.5 bg-white px-1 py-3 text-center shadow-sm">
               {s.icon}

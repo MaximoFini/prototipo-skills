@@ -245,5 +245,5 @@ export function firstName(full: string): string {
 }
 export function fillTemplate(tpl: string, s: AdminStudent): string {
   const n = s.lostStreak || s.bestStreak
-  return tpl.replaceAll('{nombre}', firstName(s.name)).replaceAll('{n}', String(n))
+  return tpl.split('{nombre}').join(firstName(s.name)).split('{n}').join(String(n))
 }

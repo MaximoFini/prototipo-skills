@@ -48,8 +48,7 @@ function finishWeek(forced: boolean) {
   if (!league.standings.length) return
   // Semana natural: los bots llegaron al domingo; forzada (demo): cierra con lo que lleva cada uno.
   const synced = syncStandings(league, forced ? elapsedNow(league.weekStart) : WEEK_MS)
-  const next = weekStart(today())
-  const nextWs = next === league.weekStart ? next : next
+  const nextWs = weekStart(today())
   const nextElapsed = Math.max(0, now() - weekStartMs(nextWs))
   liveBoostMs = 0
   const closed = closeWeek(synced, nextWs, nextElapsed)
