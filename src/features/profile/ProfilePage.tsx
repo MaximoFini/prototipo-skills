@@ -1,3 +1,4 @@
+import { ACHIEVEMENTS } from '@/data/achievements'
 import { Link } from 'react-router-dom'
 import { BarChart3, ChevronRight, Gift, Languages, Palmtree, Settings, ShoppingBag, Users } from 'lucide-react'
 import { Avatar, FlameIcon, BoltIcon, ShieldMark, TrophyIcon } from '@/design'
@@ -23,7 +24,7 @@ export default function ProfilePage() {
   const league = useApp((s) => s.league)
   const achievements = useApp((s) => s.achievements)
   const since = new Date(profile.createdAt)
-  const unlocked = Object.entries(achievements).filter(([, a]) => a.level > 0).sort((a, b) => (b[1].unlockedAt ?? 0) - (a[1].unlockedAt ?? 0))
+  const unlocked = Object.entries(achievements).filter(([id, a]) => ACHIEVEMENTS.some((d) => d.id === id) && a.level > 0).sort((a, b) => (b[1].unlockedAt ?? 0) - (a[1].unlockedAt ?? 0))
   const leagueName = LEAGUES[league.tier] ?? LEAGUES[0]
 
   const stats = [
@@ -64,7 +65,7 @@ export default function ProfilePage() {
               unlocked.slice(0, 3).map(([id, a]) => (
                 <div key={id} className="flex flex-1 flex-col items-center gap-1 text-center">
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-go-xp/30"><TrophyIcon size={28} /></span>
-                  <span className="text-[11px] font-bold capitalize text-go-muted">{id.replace(/[-_]/g, ' ')} · nv {a.level}</span>
+                  <span className="text-[11px] font-bold text-go-muted">{ACHIEVEMENTS.find((d) => d.id === id)?.title ?? id} · {['', 'Bronce', 'Plata', 'Oro'][a.level]}</span>
                 </div>
               ))
             )}

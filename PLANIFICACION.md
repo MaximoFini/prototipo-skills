@@ -1,7 +1,7 @@
 # Planificación — **Skills Go** (PWA tipo Duolingo para Skills English Institute, Córdoba)
 
 > Documento vivo y **fuente única de verdad** para implementar el prototipo (lo van a leer los subagentes).
-> Estado: **v1.0 — alcance cerrado, pendiente de aprobación final para implementar.**
+> Estado: **v1.1 — prototipo IMPLEMENTADO** (ver `README.md` para correrlo). Fase 0, Fase 1 (7 subagentes) y Fase 2 (integración + QA) completas. Quedan pendientes los puntos de la sección 11.
 > Documento hermano: [`MANUAL_DE_MARCA.md`](./MANUAL_DE_MARCA.md) (colores, tipografía, tono, componentes).
 
 ---
@@ -275,9 +275,9 @@ public/           # íconos PWA, manifest
 
 ## 9. Decisiones pendientes (mínimas)
 
-- [ ] Nombre definitivo de la mascota: **"Skilly"** (propuesto).
-- [ ] Hosting para el link de demo: Vercel / Netlify / GitHub Pages (recomiendo GitHub Pages por estar el repo ahí; se decide en Fase 2).
-- [ ] Premios Skills a mostrar (placeholder: clase de conversación gratis, 10 % de descuento en cuota, remera Skills, entrada a evento).
+- [x] Nombre de la mascota: **"Skilly"** (aprobado).
+- [x] Hosting: GitHub Pages (workflow incluido; hay que habilitar Pages → Source: GitHub Actions).
+- [x] Premios Skills: clase de conversación gratis, 10 % de descuento en cuota, remera Skills, entrada a evento.
 
 ---
 
@@ -299,3 +299,23 @@ public/           # íconos PWA, manifest
 **Fase 2 — Integración y QA (yo, secuencial):** unir, `build`/`lint`/`typecheck`, Vitest, flujos con Playwright en móvil, revisión contra el manual de marca y los criterios de la sección 6, íconos PWA, deploy estático y entrega del link.
 
 **Reglas para los subagentes:** leer `PLANIFICACION.md` y `MANUAL_DE_MARCA.md` antes de empezar; usar solo componentes y tokens de `src/design`; no editar archivos fuera de su carpeta; tipos solo de `src/domain/types.ts` (si falta algo, avisar); español rioplatense con tono Duolingo; sin dependencias nuevas sin avisar.
+
+---
+
+## 11. Estado final y pendientes
+
+**Hecho:** todo el alcance de la sección 3 (alumno + academia), 106 tests unitarios, 6 flujos e2e con Playwright (lección completa con los 9 tipos, errores y corazones, todas las pantallas, panel de demo, dashboard, PWA instalable y **offline**), build de producción verificado.
+
+**Decisiones de implementación a tener presentes**
+- *Unir pares:* falla con 3 o más errores (no resta un corazón por cada par equivocado como en Duolingo).
+- *Recargar corazones* desde el modal en una lección cortada vuelve al mapa (no retoma la lección).
+- *Dashboard:* usa datos propios de demostración, independientes de lo que haga el alumno en la app.
+- *Liga:* los bots avanzan "en vivo" mientras se mira la pantalla para que se vea el movimiento en el demo.
+- *Desafío de Vacaciones:* se corta si se saltea un día (con opción de reiniciar).
+
+**Pendientes / a validar con el cliente**
+- [ ] Contenido pedagógico: validación de Skills (niveles reales, método).
+- [ ] Logo: re-trazado vectorial propio (el escudo es una reproducción); HEX/Pantone oficiales.
+- [ ] Emojis de bandera (Windows los muestra como letras) y de vocabulario: reemplazar por ilustraciones en producción.
+- [ ] Habilitar GitHub Pages para tener el link de demo.
+- [ ] Fase 2 (producto real): ver sección 3.7.
