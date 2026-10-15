@@ -16,9 +16,11 @@ export interface OutOfHeartsModalProps {
   open: boolean
   onClose: () => void
   onPractice: () => void
+  /** Si se recarga con gemas: seguir (ej. retomar la lección). Por defecto se llama `onClose`. */
+  onRefilled?: () => void
 }
 
-export function OutOfHeartsModal({ open, onClose, onPractice }: OutOfHeartsModalProps) {
+export function OutOfHeartsModal({ open, onClose, onPractice, onRefilled }: OutOfHeartsModalProps) {
   const gems = useApp((s) => s.gems)
   const hearts = useApp((s) => s.hearts)
   const anchor = useApp((s) => s.heartsAnchor)
@@ -42,7 +44,7 @@ export function OutOfHeartsModal({ open, onClose, onPractice }: OutOfHeartsModal
   const refill = () => {
     if (!useApp.getState().refillHearts()) return
     sfx.gem()
-    onClose()
+    ;(onRefilled ?? onClose)()
   }
 
   return (

@@ -1,3 +1,4 @@
+import { askPermission, showSystemNotification } from '@/lib/systemNotify'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -172,6 +173,17 @@ export function DemoPanel() {
                 <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.vacationMilestone(7), 'hito del desafío')}>Hito del desafío</button>
                 <button type="button" className={sheetBtn} onClick={() => notify(tpl.friendNudge(friendsData[3]?.name ?? 'Lucía'), 'amigo')}>Amigo</button>
                 <button type="button" className={sheetBtn} onClick={() => notify(tpl.comeback(name()), 'te extraño')}>Te extraño</button>
+              </Section>
+
+              <Section title="Notificación del sistema">
+                <button type="button" className={sheetBtn} onClick={async () => { const r = await askPermission(); flash(r === 'granted' ? 'Permiso concedido' : r === 'unsupported' ? 'Tu navegador no lo soporta' : 'Permiso: ' + r) }}>Pedir permiso</button>
+                <button type="button" className={sheetBtn} onClick={() => {
+                  flash('Llega en 10 s: minimizá la app')
+                  window.setTimeout(async () => {
+                    const t = tpl.streakRisk(name(), Math.max(1, A().streak.count || 5))
+                    if (!(await showSystemNotification(t.title, t.body))) A().pushNotification(t)
+                  }, 10_000)
+                }}>Enviar en 10 s</button>
               </Section>
 
               <Section title="Liga">

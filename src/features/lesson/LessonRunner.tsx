@@ -32,7 +32,7 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
   const reduce = useReducedMotion()
   const hearts = useApp((s) => s.hearts)
   const [state, dispatch] = useReducer(lessonReducer, undefined, () =>
-    initLesson(exercises, { consumesHearts, hearts: useApp.getState().hearts }),
+    initLesson(exercises, { consumesHearts, hearts: useApp.getState().hearts, repeatMistakes: mode !== 'placement' }),
   )
   const startedAt = useRef(now())
   const finished = useRef(false)
@@ -68,7 +68,7 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
     const ev = evaluate(item.ex, answer)
     setEvaluation(ev)
     setMessage(pick(ev.correct ? CORRECT_MESSAGES : WRONG_MESSAGES))
-    dispatch({ type: 'answer', correct: ev.correct })
+    dispatch({ type: 'answer', correct: ev.correct, flawed: ev.flawed })
     if (ev.correct) {
       sfx.correct()
       const run = state.streak + 1
@@ -83,6 +83,27 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
     }
     if (!showFeedback) proceed()
   }, [item, answer, state.phase, state.streak, consumesHearts, showFeedback, proceed])
+
+  // Par equivocado en "unir pares": cuesta un corazón en el acto (calco de Duolingo).
+  const onMistake = useCallback(() => {
+    if (!consumesHearts) return
+    const had = useApp.getState().hearts > 0
+    if (had) {
+      useApp.getState().loseHeart()
+      setHeartHit((n) => n + 1)
+      window.setTimeout(() => sfx.heartLost(), 200)
+    }
+    dispatch({ type: 'heart-lost' })
+  }, [consumesHearts])
+
+  // Si estaba cortada por corazones y se recargaron (gemas, espera o práctica), sigue donde quedó.
+  useEffect(() => {
+    if (state.status !== 'out' || hearts <= 0) return
+    finished.current = false
+    setAnswer(null)
+    setEvaluation(null)
+    dispatch({ type: 'resume', hearts })
+  }, [state.status, hearts])
 
   const skip = useCallback(() => {
     setAnswer(null)
@@ -134,7 +155,7 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
               <p className="mb-2 inline-block rounded-full bg-go-surface px-3 py-0.5 text-[12px] font-bold uppercase tracking-wider text-go-muted">Repaso</p>
             )}
             <div className={feedback ? 'pointer-events-none' : ''}>
-              <ExerciseView ex={item.ex} locked={feedback} verdict={verdict} onAnswer={setAnswer} onSkip={skip} />
+              <ExerciseView ex={item.ex} locked={feedback} verdict={verdict} onAnswer={setAnswer} onSkip={skip} onMistake={onMistake} />
             </div>
           </motion.div>
         )}

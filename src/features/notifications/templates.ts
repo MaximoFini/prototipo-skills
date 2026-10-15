@@ -37,6 +37,6 @@ export const notificationTemplates = {
   comeback: (name: string): Tpl => ({
     kind: 'generic',
     title: name ? `${name}, ¿todo bien?` : '¿Todo bien?',
-    body: 'Skilly te extraña… 😢 Volvé a practicar.',
+    body: 'Skilly te extraña… Volvé a practicar, que se pone triste.',
   }),
 }

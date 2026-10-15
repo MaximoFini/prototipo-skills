@@ -97,12 +97,12 @@ export const a1Units: Unit[] = [
           '¡Tu primera presentación completa! Decila fuerte y con onda.'),
       ]),
       lesson('a1-u1-l3', '¿De dónde sos?', [
-        ci('Brazil', [['🇦🇷', 'Argentina'], ['🇧🇷', 'Brazil'], ['🇨🇱', 'Chile'], ['🇪🇸', 'Spain']], 1,
-          '"Brazil" es Brasil. ¡Ojo que se escribe con "z" y no lleva "s"!', [{ en: 'Brazil', es: 'Brasil', emoji: '🇧🇷' }]),
+        ci('football', [['🏀', 'basketball'], ['⚽', 'football'], ['🎾', 'tennis'], ['🏐', 'volleyball']], 1,
+          '"Football" es el fútbol, ¡el deporte favorito en Argentina! En Estados Unidos ese nombre es para el fútbol americano.', [{ en: 'football', es: 'fútbol', emoji: '⚽' }]),
         mp(
           [{ en: 'Brazil', es: 'Brasil' }, { en: 'Spain', es: 'España' }, { en: 'Italy', es: 'Italia' }, { en: 'Germany', es: 'Alemania' }, { en: 'France', es: 'Francia' }],
           'Los países se escriben con mayúscula en inglés. Varios cambian un poquito: "Spain", "Italy", "Germany".',
-          ['🇧🇷', '🇪🇸', '🇮🇹', '🇩🇪', '🇫🇷'],
+          ['🌴', '💃', '🍕', '🚗', '🥖'],
         ),
         ct('Where are you from?', 'en', ['¿Dónde vivís?', '¿De dónde sos?', '¿Cómo te llamás?'], 1,
           '"Where" = "dónde" y "from" = "de". Juntas: "¿de dónde sos?".', [{ en: 'where', es: 'dónde' }, { en: 'from', es: 'de (origen)' }]),

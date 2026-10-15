@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { LessonSummary, RunnerResult } from '@/domain/types'
 import { getLesson } from '@/data/content'
@@ -29,6 +29,12 @@ function LessonFlow({ lessonId, exercises }: { lessonId: string; exercises: NonN
 
   const goHome = () => navigate('/', { replace: true })
 
+  // Si estando cortada la lección vuelven los corazones (recarga o regeneración), se retoma donde quedó.
+  const hearts = useApp((s) => s.hearts)
+  useEffect(() => {
+    if (!blocked && outOfHearts && hearts > 0) setOutOfHearts(false)
+  }, [blocked, outOfHearts, hearts])
+
   const next = (from: Stage, s: LessonSummary) => {
     if (from === 'result' && s.goalReached) return setStage('goal')
     if ((from === 'result' || from === 'goal') && s.streakExtended) return setStage('streak')
@@ -58,7 +64,7 @@ function LessonFlow({ lessonId, exercises }: { lessonId: string; exercises: NonN
         <DailyGoalCelebration goal={useApp.getState().settings.dailyGoal} onContinue={() => next('goal', summary)} />
       )}
       {stage === 'streak' && summary && <StreakExtendedScreen streak={summary.streak} onContinue={goHome} />}
-      <OutOfHeartsModal open={outOfHearts} onClose={goHome} onPractice={() => navigate('/practice/session?heal=1', { replace: true })} />
+      <OutOfHeartsModal open={outOfHearts} onClose={goHome} onRefilled={() => setOutOfHearts(false)} onPractice={() => navigate('/practice/session?heal=1', { replace: true })} />
     </div>
   )
 }

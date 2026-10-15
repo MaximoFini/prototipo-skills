@@ -7,8 +7,8 @@ import type { UserState } from '@/domain/types'
 import { metricValue, nextProgress, singularize } from './achievements'
 
 const MEDAL_STYLE = [
-  { bg: '#D8CFCC', ring: '#B5ABA6', text: '#6B6360' },
-  { bg: '#E0A070', ring: '#B06A35', text: '#6E3B14' }, // bronce
+  { bg: '#E4DDD9', ring: '#B5ABA6', text: '#4A4340' },
+  { bg: '#E0A070', ring: '#B06A35', text: '#4A2509' }, // bronce
   { bg: '#E3E6EA', ring: '#9AA3AD', text: '#4A525B' }, // plata
   { bg: '#F2C94C', ring: '#C9A02C', text: '#5A4408' }, // oro
 ]
@@ -76,7 +76,7 @@ export default function AchievementsPage() {
   return (
     <div className="flex h-full flex-col bg-white">
       <ScreenHeader title="Logros" />
-      <div className="scroll-y flex-1 px-4 pb-8 pt-4">
+      <div className="scroll-y flex-1 px-4 pb-8 pt-4" tabIndex={0}>
         <div className="mb-4 flex items-center gap-3 rounded-[20px] bg-go-primary p-4 text-white">
           <Skilly mood={unlocked ? 'cheer' : 'wink'} size={64} />
           <div>

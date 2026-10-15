@@ -122,9 +122,58 @@ describe('evaluate', () => {
     expect(evaluate(c, 1).correct).toBe(true)
     expect(evaluate(c, 0).correct).toBe(false)
   })
-  it('unir pares tolera hasta 2 tropiezos', () => {
+  it('unir pares siempre avanza; con tropiezos queda marcado como error', () => {
     const m = { id: 'm', type: 'match-pairs', pairs: [{ en: 'a', es: 'b' }] } as Exercise
-    expect(evaluate(m, { errors: 2 }).correct).toBe(true)
-    expect(evaluate(m, { errors: 3 }).correct).toBe(false)
+    expect(evaluate(m, { errors: 0 })).toMatchObject({ correct: true, flawed: false })
+    expect(evaluate(m, { errors: 3 })).toMatchObject({ correct: true, flawed: true })
+  })
+})
+
+describe('unir pares y reanudar', () => {
+  const ex = (i: number) => ({ id: `e${i}`, type: 'type-translation', prompt: 'x', promptLang: 'es', accepted: ['x'] }) as never
+  it('cada par equivocado resta un corazón y a 0 corta en el acto', () => {
+    let s = initLesson([ex(1), ex(2)], { consumesHearts: true, hearts: 2 })
+    s = lessonReducer(s, { type: 'heart-lost' })
+    expect(s.hearts).toBe(1)
+    expect(s.status).toBe('playing')
+    s = lessonReducer(s, { type: 'heart-lost' })
+    expect(s.hearts).toBe(0)
+    expect(s.status).toBe('out')
+    expect(s.outFrom).toBe('match')
+    expect(buildResult(s, 5).mistakes).toHaveLength(1)
+  })
+  it('completar unir pares con errores avanza sin repetirse y cuenta como error', () => {
+    let s = initLesson([ex(1), ex(2)], { consumesHearts: true, hearts: 5 })
+    s = lessonReducer(s, { type: 'heart-lost' })
+    s = lessonReducer(s, { type: 'answer', correct: true, flawed: true })
+    s = lessonReducer(s, { type: 'continue' })
+    expect(s.queue).toHaveLength(1)
+    expect(s.firstTry[0]).toBe(false)
+    expect(s.streak).toBe(0)
+  })
+  it('tras recargar corazones retoma la lección (descarta el ejercicio fallado)', () => {
+    let s = initLesson([ex(1), ex(2)], { consumesHearts: true, hearts: 1 })
+    s = lessonReducer(s, { type: 'answer', correct: false })
+    s = lessonReducer(s, { type: 'continue' })
+    expect(s.status).toBe('out')
+    s = lessonReducer(s, { type: 'resume', hearts: 5 })
+    expect(s.status).toBe('playing')
+    expect(s.hearts).toBe(5)
+    expect(s.queue[0].orig).toBe(1)
+  })
+  it('si se cortó en unir pares, reintenta ese ejercicio', () => {
+    let s = initLesson([ex(1), ex(2)], { consumesHearts: true, hearts: 1 })
+    s = lessonReducer(s, { type: 'heart-lost' })
+    s = lessonReducer(s, { type: 'resume', hearts: 5 })
+    expect(s.queue[0].orig).toBe(0)
+  })
+})
+
+describe('test de nivel', () => {
+  it('sin repetición de errores', () => {
+    let s = initLesson(mk(3), { consumesHearts: false, hearts: 5, repeatMistakes: false })
+    s = run(s, ...bad, ...bad, ...bad)
+    expect(s.status).toBe('done')
+    expect(buildResult(s, 1).mistakes).toHaveLength(3)
   })
 })

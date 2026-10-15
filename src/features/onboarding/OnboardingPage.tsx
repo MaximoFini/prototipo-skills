@@ -1,3 +1,4 @@
+import { askPermission } from '@/lib/systemNotify'
 import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -42,6 +43,7 @@ export default function OnboardingPage() {
     const app = useApp.getState()
     app.completeOnboarding({ name: name.trim() || 'Alumno', avatar, level: level === 'test' || level === null ? 'A1' : level, dailyGoal: goal })
     app.setSettings({ notifications })
+    if (notifications) void askPermission()
     sfx.finish()
     nav(level === 'test' ? '/placement' : '/', { replace: true })
   }

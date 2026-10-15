@@ -81,6 +81,7 @@ export default function PathPage() {
 
   const items = useMemo(buildMap, [])
   const activeId = currentLessonId(completed)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- cambia la frase al avanzar de lección
   const cheer = useMemo(() => CHEERS[Math.floor(Math.random() * CHEERS.length)], [activeId])
 
   useEffect(() => {

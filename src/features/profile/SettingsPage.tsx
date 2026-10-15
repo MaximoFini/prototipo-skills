@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { Button, Modal, ScreenHeader } from '@/design'
+import { Button, InstallCard, Modal, ScreenHeader } from '@/design'
 import { useApp } from '@/store/useApp'
 import { GOAL_LABELS } from '@/domain/rules'
 import type { DailyGoal } from '@/domain/types'
@@ -29,6 +29,8 @@ export default function SettingsPage() {
     <div className="flex h-full flex-col">
       <ScreenHeader title="Configuración" back="/profile" />
       <div className="scroll-y flex-1 space-y-5 px-4 py-4">
+        <InstallCard />
+
         <section aria-label="Meta diaria">
           <h2 className="mb-2 font-display text-[18px] font-extrabold text-go-text">Meta diaria</h2>
           <div className="space-y-2" role="radiogroup" aria-label="Meta diaria">

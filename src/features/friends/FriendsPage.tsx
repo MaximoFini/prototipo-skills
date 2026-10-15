@@ -31,7 +31,7 @@ export default function FriendsPage() {
               <Avatar id={top.avatar} name={top.name} size={52} />
               <div className="min-w-0 flex-1">
                 <p className="font-display text-[18px] font-extrabold leading-tight text-go-text">{top.name} lleva {top.streak} días. ¿Lo alcanzás?</p>
-                <p className="mt-0.5 flex items-center gap-1 text-[13px] font-bold text-go-streak"><FlameIcon size={18} />{top.streak} días seguidos</p>
+                <p className="mt-0.5 flex items-center gap-1 text-[13px] font-bold text-go-streak-text"><FlameIcon size={18} />{top.streak} días seguidos</p>
               </div>
             </div>
             {!following.includes(top.id) && (
@@ -62,7 +62,7 @@ function Row({ f, followed, onToggle }: { f: Friend; followed: boolean; onToggle
       <div className="min-w-0 flex-1">
         <p className="flex items-baseline gap-2"><span className="truncate font-display text-[16px] font-extrabold text-go-text">{f.name}</span><span className="shrink-0 text-[12px] font-medium text-go-muted">{f.commission}</span></p>
         <p className="flex items-center gap-3 whitespace-nowrap text-[13px] font-bold">
-          <span className="flex items-center gap-0.5 text-go-streak"><FlameIcon size={16} />{f.streak}</span>
+          <span className="flex items-center gap-0.5 text-go-streak-text"><FlameIcon size={16} />{f.streak}</span>
           <span className="flex items-center gap-0.5 text-go-xp-dark"><BoltIcon size={16} />{f.weekXp} XP</span>
         </p>
       </div>

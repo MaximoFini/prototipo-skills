@@ -28,16 +28,24 @@ export interface LessonState {
   hearts: number
   heartsLost: number
   consumesHearts: boolean
+  /** Si el ejercicio fallado se repite al final (false en el test de nivel). */
+  repeatMistakes: boolean
   status: 'playing' | 'done' | 'out'
+  /** Desde dónde se cortó por corazones: tras responder (hay que descartar el ejercicio) o a mitad de unir pares. */
+  outFrom: 'answer' | 'match' | null
   exercises: Exercise[]
 }
 
 export type LessonAction =
-  | { type: 'answer'; correct: boolean }
+  | { type: 'answer'; correct: boolean; /** correcto pero con tropiezos (unir pares con errores): cuenta como error sin repetirse. */ flawed?: boolean }
   | { type: 'skip' }
   | { type: 'continue' }
+  /** Un par equivocado en "unir pares": resta un corazón al instante (como Duolingo). */
+  | { type: 'heart-lost' }
+  /** Se recargaron corazones: sigue donde quedó. */
+  | { type: 'resume'; hearts: number }
 
-export function initLesson(exercises: Exercise[], opts: { consumesHearts: boolean; hearts: number }): LessonState {
+export function initLesson(exercises: Exercise[], opts: { consumesHearts: boolean; hearts: number; repeatMistakes?: boolean }): LessonState {
   return {
     queue: exercises.map((ex, orig) => ({ ex, orig, attempt: 0 })),
     total: exercises.length,
@@ -51,7 +59,9 @@ export function initLesson(exercises: Exercise[], opts: { consumesHearts: boolea
     hearts: opts.hearts,
     heartsLost: 0,
     consumesHearts: opts.consumesHearts,
+    repeatMistakes: opts.repeatMistakes ?? true,
     status: exercises.length === 0 ? 'done' : 'playing',
+    outFrom: null,
     exercises,
   }
 }
@@ -67,6 +77,12 @@ export function progressPct(s: LessonState): number {
 }
 
 export function lessonReducer(s: LessonState, a: LessonAction): LessonState {
+  if (a.type === 'resume') {
+    if (s.status !== 'out') return s
+    // Tras un error se descarta el ejercicio fallado (ya quedó repetido al final); en unir pares se reintenta.
+    const queue = s.outFrom === 'answer' ? s.queue.slice(1) : s.queue
+    return { ...s, hearts: a.hearts, status: queue.length === 0 ? 'done' : 'playing', outFrom: null, phase: 'answering', lastCorrect: null, queue }
+  }
   if (s.status !== 'playing') return s
   const item = s.queue[0]
   if (!item) return s
@@ -75,18 +91,18 @@ export function lessonReducer(s: LessonState, a: LessonAction): LessonState {
     case 'answer': {
       if (s.phase !== 'answering') return s
       if (a.correct) {
-        const streak = s.streak + 1
+        const streak = a.flawed ? 0 : s.streak + 1
         return {
           ...s,
           phase: 'feedback',
           lastCorrect: true,
           streak,
           bestStreak: Math.max(s.bestStreak, streak),
-          firstTry: item.attempt === 0 ? { ...s.firstTry, [item.orig]: true } : s.firstTry,
+          firstTry: item.attempt === 0 ? { ...s.firstTry, [item.orig]: !a.flawed } : s.firstTry,
           done: { ...s.done, [item.orig]: true },
         }
       }
-      const repeat = item.attempt < MAX_REPEATS
+      const repeat = s.repeatMistakes && item.attempt < MAX_REPEATS
       const lose = s.consumesHearts && s.hearts > 0
       return {
         ...s,
@@ -114,10 +130,23 @@ export function lessonReducer(s: LessonState, a: LessonAction): LessonState {
     case 'continue': {
       if (s.phase !== 'feedback') return s
       if (s.consumesHearts && s.hearts === 0 && s.lastCorrect === false) {
-        return { ...s, status: 'out', phase: 'answering' }
+        return { ...s, status: 'out', outFrom: 'answer', phase: 'answering' }
       }
       const queue = s.queue.slice(1)
       return { ...s, queue, phase: 'answering', lastCorrect: null, status: queue.length === 0 ? 'done' : 'playing' }
+    }
+    case 'heart-lost': {
+      if (s.phase !== 'answering' || !s.consumesHearts || s.hearts <= 0) return s
+      const hearts = s.hearts - 1
+      return {
+        ...s,
+        hearts,
+        heartsLost: s.heartsLost + 1,
+        streak: 0,
+        firstTry: item.attempt === 0 ? { ...s.firstTry, [item.orig]: false } : s.firstTry,
+        status: hearts === 0 ? 'out' : s.status,
+        outFrom: hearts === 0 ? 'match' : s.outFrom,
+      }
     }
   }
 }

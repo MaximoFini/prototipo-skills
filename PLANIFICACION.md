@@ -304,18 +304,24 @@ public/           # íconos PWA, manifest
 
 ## 11. Estado final y pendientes
 
-**Hecho:** todo el alcance de la sección 3 (alumno + academia), 106 tests unitarios, 6 flujos e2e con Playwright (lección completa con los 9 tipos, errores y corazones, todas las pantallas, panel de demo, dashboard, PWA instalable y **offline**), build de producción verificado.
+**Hecho:** todo el alcance de la sección 3 (alumno + academia), 111 tests unitarios y 13 flujos e2e con Playwright (lección completa con los 9 tipos, errores y corazones, recarga a mitad de lección, onboarding + test de nivel, todas las pantallas, panel de demo, dashboard, auditoría de accesibilidad, PWA instalable y **offline**), build de producción verificado.
 
-**Decisiones de implementación a tener presentes**
-- *Unir pares:* falla con 3 o más errores (no resta un corazón por cada par equivocado como en Duolingo).
-- *Recargar corazones* desde el modal en una lección cortada vuelve al mapa (no retoma la lección).
+**Decisiones de implementación (resueltas con criterio propio)**
+- *Unir pares:* cada par equivocado **resta un corazón al instante** (calco de Duolingo); completar los pares siempre avanza y, si hubo tropiezos, queda guardado como error para practicar. No se repite el ejercicio.
+- *Sin vidas a mitad de lección:* si se recarga (gemas), se espera o se recupera un corazón, **la lección se retoma donde quedó**; no se pierde el progreso.
+- *Test de nivel:* los errores no se repiten ni hay feedback (se evalúa a la primera).
 - *Dashboard:* usa datos propios de demostración, independientes de lo que haga el alumno en la app.
 - *Liga:* los bots avanzan "en vivo" mientras se mira la pantalla para que se vea el movimiento en el demo.
 - *Desafío de Vacaciones:* se corta si se saltea un día (con opción de reiniciar).
+- *Emojis:* se eliminaron las banderas (Windows las muestra como letras); los emojis de vocabulario quedan como ilustración de contenido.
+- *Notificaciones:* in-app simuladas + **notificación real del sistema** (Notification API) disparable desde el panel de demo ("Enviar en 10 s", minimizando la app). Web Push de servidor queda para Fase 2.
+- *Instalación:* tarjeta "Instalá Skills Go" en Configuración (prompt nativo en Android, instrucciones en iOS).
+- *Accesibilidad:* auditoría con axe (WCAG 2.1 AA) en todas las pantallas del alumno, landing y dashboard: **0 violaciones**. Se oscurecieron los textos de gemas/racha/XP y se nombraron las barras de progreso.
+- *Calidad:* ESLint (0 errores, 0 warnings), TypeScript estricto, 111 tests unitarios, 13 flujos e2e.
 
 **Pendientes / a validar con el cliente**
 - [ ] Contenido pedagógico: validación de Skills (niveles reales, método).
 - [ ] Logo: re-trazado vectorial propio (el escudo es una reproducción); HEX/Pantone oficiales.
-- [ ] Emojis de bandera (Windows los muestra como letras) y de vocabulario: reemplazar por ilustraciones en producción.
+- [ ] Emojis de vocabulario: reemplazar por ilustraciones propias en producción.
 - [ ] Habilitar GitHub Pages para tener el link de demo.
 - [ ] Fase 2 (producto real): ver sección 3.7.

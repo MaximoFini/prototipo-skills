@@ -6,7 +6,7 @@ import { Instruction, useShuffled, type ExerciseProps } from './shared'
 
 type Side = 'en' | 'es'
 
-export function MatchPairsExercise({ ex, locked, onAnswer }: ExerciseProps<T>) {
+export function MatchPairsExercise({ ex, locked, onAnswer, onMistake }: ExerciseProps<T>) {
   const enOrder = useShuffled(ex.pairs.map((p, i) => ({ t: p.en, i })), ex.id + 'en')
   const esOrder = useShuffled(ex.pairs.map((p, i) => ({ t: p.es, i })), ex.id + 'es')
   const [sel, setSel] = useState<{ side: Side; i: number } | null>(null)
@@ -30,6 +30,7 @@ export function MatchPairsExercise({ ex, locked, onAnswer }: ExerciseProps<T>) {
       if (next.length === ex.pairs.length) onAnswer({ errors: errors.current })
     } else {
       errors.current += 1
+      onMistake?.()
       sfx.wrong()
       setWrong({ en: enI, es: esI })
       setSel(null)

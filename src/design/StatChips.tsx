@@ -25,7 +25,7 @@ export function StreakChip({ onClick }: { onClick?: () => void }) {
   const streak = useApp((s) => s.streak)
   const done = streak.lastDay === dayKey()
   return (
-    <button type="button" onClick={onClick} className={`${base} ${done ? 'text-go-streak' : 'text-go-muted'}`} aria-label={`Racha de ${streak.count} días`}>
+    <button type="button" onClick={onClick} className={`${base} ${done ? 'text-go-streak-text' : 'text-go-muted'}`} aria-label={`Racha de ${streak.count} días`}>
       <FlameIcon size={26} off={!done} /><span>{streak.count}</span>
     </button>
   )

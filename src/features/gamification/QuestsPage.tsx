@@ -103,7 +103,7 @@ export default function QuestsPage() {
         <div className="flex items-center gap-1"><StreakChip /><GemChip /></div>
       </header>
 
-      <div className="scroll-y relative flex-1 px-4 pb-6">
+      <div className="scroll-y relative flex-1 px-4 pb-6" tabIndex={0}>
         {gain !== null && (
           <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center" role="status">
             <span className="flex items-center gap-1 rounded-full bg-go-xp px-4 py-2 font-display text-[17px] font-extrabold text-go-text shadow-lg">+{gain} <GemIcon size={20} /> ¡Cofre abierto!</span>

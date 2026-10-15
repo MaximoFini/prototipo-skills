@@ -6,14 +6,14 @@ export type AnswerValue = number | string[] | string | { errors: number } | true
 
 export interface Evaluation {
   correct: boolean
+  /** Correcto pero con tropiezos (unir pares con errores): suma como error pero no se repite. */
+  flawed?: boolean
   /** Correcto pero con un typo: se avisa "¡Ojo con la ortografía!". */
   almost?: boolean
   /** Texto de la respuesta correcta para el panel de feedback. */
   answerText: string
 }
 
-/** En "unir pares" hasta este número de tropiezos se considera correcto. */
-export const MATCH_MAX_ERRORS = 2
 
 export function evaluate(ex: Exercise, value: AnswerValue): Evaluation {
   const answerText = correctAnswerText(ex)
@@ -36,7 +36,8 @@ export function evaluate(ex: Exercise, value: AnswerValue): Evaluation {
     }
     case 'match-pairs': {
       const errors = (value as { errors: number }).errors
-      return { correct: errors <= MATCH_MAX_ERRORS, answerText }
+      // Como Duolingo: cada par equivocado ya costó un corazón; completar los pares siempre avanza.
+      return { correct: true, flawed: errors > 0, answerText }
     }
     case 'speak':
       return { correct: true, answerText }

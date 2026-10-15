@@ -131,7 +131,7 @@ export default function LeaguePage() {
           <div><Skilly mood="sleepy" size={80} /><p className="mt-2">Armando tu liga…</p></div>
         </div>
       ) : (
-        <div className="scroll-y flex-1">
+        <div className="scroll-y flex-1" tabIndex={0}>
           <div className="flex items-center gap-3 border-b border-go-border bg-white px-4 py-2.5 text-[14px]">
             <Skilly mood={myPos <= PROMOTE_COUNT ? 'wink' : 'think'} size={34} />
             <p className="flex-1 text-go-text">

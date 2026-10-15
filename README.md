@@ -11,10 +11,11 @@ Prototipo de **PWA de práctica de inglés tipo Duolingo** para **Skills English
 ```bash
 npm install
 npm run dev        # desarrollo
-npm test           # tests de dominio, contenido, liga, misiones, dashboard (106)
+npm test           # tests de dominio, contenido, liga, misiones, lección, dashboard (111)
+npm run lint       # ESLint
 npm run build      # build de producción (PWA con service worker)
 npm run preview    # servir el build
-npm run e2e        # flujos completos con Playwright en viewport de celular (390×844)
+npm run e2e        # 13 flujos con Playwright en celular (incluye auditoría de accesibilidad con axe)
 ```
 
 ## Cómo mostrarlo (guion de 5 minutos)
@@ -22,7 +23,7 @@ npm run e2e        # flujos completos con Playwright en viewport de celular (390
 1. Abrir en el celular → "Agregar a inicio" → splash.
 2. **Empezar** (o "Entrar con perfil demo") → primera lección: acertar, equivocarse (pierde un corazón), terminar con festejo y racha.
 3. Mapa, misiones, liga, logros, tienda.
-4. **Panel de demo**: 3 toques seguidos sobre el escudo (arriba a la izquierda del mapa) o `Ctrl/Cmd + Shift + D`. Permite pasar días, quedarse sin corazones, disparar notificaciones, cerrar la semana de la liga, cargar un "alumno con 12 días de racha", etc.
+4. **Panel de demo**: 3 toques seguidos sobre el escudo (arriba a la izquierda del mapa) o `Ctrl/Cmd + Shift + D`. Permite pasar días, quedarse sin corazones, disparar notificaciones (incluida una **notificación real del sistema** a los 10 s: minimizá la app), cerrar la semana de la liga, cargar un "alumno con 12 días de racha", etc.
 5. **Desafío de Vacaciones** y **Mis premios** (canje en la academia).
 6. **Dashboard de la academia**: `/admin` (login simulado) → retención, alumnos en riesgo, "Enviar mensaje".
 

@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, useRef, type ReactNode } from 'react'
 import { Turtle, Volume2 } from 'lucide-react'
 import { CheckIcon, CrossIcon } from '@/design'
 import { speak, ttsAvailable } from '@/lib/tts'
@@ -17,18 +17,22 @@ export interface ExerciseProps<T extends Exercise = Exercise> {
   onAnswer: (v: AnswerValue | null) => void
   /** Omitir sin penalidad (audio / micrófono). */
   onSkip: () => void
+  /** Un tropiezo dentro del ejercicio (par equivocado en "unir pares"): resta un corazón al instante. */
+  onMistake?: () => void
 }
 
 /** Mezcla estable por montaje. */
 export function useShuffled<T>(items: T[], key: unknown): T[] {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ref = useRef(items)
+  ref.current = items
   return useMemo(() => {
-    const a = [...items]
+    const a = [...ref.current]
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[a[i], a[j]] = [a[j], a[i]]
     }
     return a
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- se mezcla una vez por ejercicio (`key`)
   }, [key])
 }
 

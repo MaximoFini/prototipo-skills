@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { a1Units } from '../src/data/levels/a1'
+import { placementTest } from '../src/data/levels/placement'
 import type { Exercise } from '../src/domain/types'
 
 const shot = (page: Page, name: string) => page.screenshot({ path: `shots/${name}.png` })
@@ -43,7 +44,7 @@ async function solve(page: Page, ex: Exercise, wrong = false) {
       break
     case 'match-pairs':
       if (wrong) {
-        for (let k = 0; k < 3; k++) {
+        for (let k = 0; k < 1; k++) {
           await page.locator(`button[lang="en"][aria-label="${ex.pairs[0].en}"]`).click()
           await page.locator(`button[lang="es"][aria-label="${ex.pairs[1].es}"]`).click()
           await page.waitForTimeout(900)
@@ -89,7 +90,7 @@ test('lección completa: 9 tipos de ejercicio, resultado, racha y vuelta al mapa
   await shot(page, '04-resultado')
   await page.getByRole('button', { name: 'Continuar' }).click()
   // Meta diaria (10 XP con meta 20 → puede no cumplirse) y racha extendida
-  for (let k = 0; k < 3; k++) {
+  for (let k = 0; k < 1; k++) {
     const b = page.getByRole('button', { name: /continuar/i })
     if (await b.isVisible().catch(() => false)) { await page.waitForTimeout(2500); await shot(page, `05-extra-${k}`); await b.click() }
   }
@@ -101,18 +102,24 @@ test('lección completa: 9 tipos de ejercicio, resultado, racha y vuelta al mapa
   expect(state.hearts).toBe(5)
 })
 
-test('errores quitan corazones y a 0 se corta la lección con el modal', async ({ page }) => {
+test('errores quitan corazones (unir pares y respuestas) y a 0 se corta la lección con el modal', async ({ page }) => {
   await demoProfile(page)
   await startFirstLesson(page)
-  for (let n = 0; n < 5; n++) {
-    const ex = lesson1.exercises[n]
-    await solve(page, ex, true)
+  const hearts = () => page.evaluate(() => JSON.parse(localStorage.getItem('skills-go-v1')!).state.hearts)
+  // Ejercicio 1 (unir pares): un par equivocado = -1 corazón, y completar avanza igual.
+  await solve(page, lesson1.exercises[0], true)
+  expect(await hearts()).toBe(4)
+  await page.getByRole('button', { name: 'Comprobar' }).click()
+  await page.getByRole('button', { name: /^(Continuar|Terminar)$/ }).click()
+  // Los siguientes 4 errores dejan en 0.
+  for (let n = 1; n <= 4; n++) {
+    await solve(page, lesson1.exercises[n], true)
     await page.getByRole('button', { name: 'Comprobar' }).click()
-    if (n === 0) await shot(page, '06-error')
+    if (n === 1) await shot(page, '06-error')
     await page.getByRole('button', { name: /^(Continuar|Terminar)$/ }).click()
   }
-  const hearts = await page.evaluate(() => JSON.parse(localStorage.getItem('skills-go-v1')!).state.hearts)
-  expect(hearts).toBeLessThan(5)
+  await expect(page.getByText('¡Te quedaste sin vidas!')).toBeVisible()
+  expect(await hearts()).toBe(0)
 })
 
 test('tienda, misiones, liga, perfil y desafío de vacaciones cargan', async ({ page }) => {
@@ -169,4 +176,69 @@ test('funciona offline después de la primera carga', async ({ page, context }) 
   await expect(page.locator('body')).toContainText(/Hello!/i)
   await page.goto('/lesson/' + lesson1.id)
   await expect(page.getByRole('button', { name: 'Salir de la lección' })).toBeVisible()
+})
+
+
+for (const [label, wrong, expected] of [['todo bien → B1', false, 'B1'], ['todo mal → A1', true, 'A1']] as const) {
+  test(`alumno nuevo: onboarding + test de nivel (${label})`, async ({ page }) => {
+    await page.goto('/')
+    await page.waitForURL('**/welcome')
+    await page.getByRole('button', { name: 'Empezar', exact: true }).click()
+    await page.getByPlaceholder('Tu nombre').fill('Tomi')
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('radio', { name: /Hacer test de nivel/ }).click()
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('radio', { name: /Serio/ }).click()
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: /Ahora no/ }).click()
+    await page.waitForURL('**/placement')
+    await shot(page, `20-placement-${expected}`)
+    for (const ex of placementTest) {
+      await solve(page, ex, wrong)
+      await page.getByRole('button', { name: 'Comprobar' }).click()
+    }
+    await expect(page.getByText(new RegExp(expected))).toBeVisible()
+    await page.waitForTimeout(800)
+    await shot(page, `21-nivel-${expected}`)
+    await page.getByRole('button', { name: /empezar/i }).click()
+    await page.waitForURL(/localhost:4173\/$/)
+    const st = await page.evaluate(() => JSON.parse(localStorage.getItem('skills-go-v1')!).state)
+    expect(st.profile.level).toBe(expected)
+    expect(st.settings.dailyGoal).toBe(30)
+    expect(st.hearts).toBe(5)
+    if (expected === 'B1') expect(Object.keys(st.completed).length).toBeGreaterThanOrEqual(16)
+  })
+}
+
+test('sin corazones a mitad de la lección: recarga con gemas y retoma donde quedó', async ({ page }) => {
+  await demoProfile(page)
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem('skills-go-v1')!)
+    raw.state.hearts = 1
+    raw.state.gems = 500
+    localStorage.setItem('skills-go-v1', JSON.stringify(raw))
+  })
+  await page.reload()
+  await startFirstLesson(page)
+  const first = lesson1.exercises[0]
+  expect(first.type).toBe('match-pairs')
+  if (first.type !== 'match-pairs') return
+  // un par equivocado = un corazón menos, en el acto
+  await page.locator(`button[lang="en"][aria-label="${first.pairs[0].en}"]`).click()
+  await page.locator(`button[lang="es"][aria-label="${first.pairs[1].es}"]`).click()
+  await expect(page.getByText('¡Te quedaste sin vidas!')).toBeVisible()
+  await shot(page, '22-sin-vidas')
+  await page.getByRole('button', { name: /Recargar con 350 gemas/ }).click()
+  await expect(page.getByText('¡Te quedaste sin vidas!')).toBeHidden()
+  await expect(page.getByRole('heading', { name: /Uní cada palabra/ })).toBeVisible()
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem('skills-go-v1')!).state)
+  expect(st.hearts).toBe(5)
+  expect(st.gems).toBe(150)
+})
+
+test('en escritorio se ve dentro de un marco de teléfono', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 })
+  await demoProfile(page)
+  await page.waitForTimeout(500)
+  await shot(page, '23-escritorio')
 })
