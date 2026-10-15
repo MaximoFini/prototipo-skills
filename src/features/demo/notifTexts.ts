@@ -27,19 +27,4 @@ export const notifTexts = {
       : day === 14 ? 'Ganaste 10 % de descuento en tu próxima cuota. ¡Reclamalo!'
       : 'Ganaste la remera y la entrada al evento Skills. ¡Reclamalos!',
   }),
-  vacationReminder: (): T => ({
-    kind: 'vacation',
-    title: 'Tu inglés no se toma vacaciones',
-    body: 'Vos sí, pero practicá 5 minutos y seguí sumando días en el Desafío.',
-  }),
-  friendNudge: (friendName: string): T => ({
-    kind: 'friend',
-    title: `${friendName} ya practicó hoy`,
-    body: 'No lo dejes ganar. Una lección y quedan a mano.',
-  }),
-  comeback: (name: string): T => ({
-    kind: 'generic',
-    title: `${name}, te extrañamos`,
-    body: 'Skilly está mirando la puerta. Volvé con una lección cortita.',
-  }),
 }

@@ -9,6 +9,8 @@ import { allLessons, currentLessonId } from '@/data/content'
 import type { RunnerResult, UserState } from '@/domain/types'
 import { closeLeagueWeek } from '@/features/league/register'
 import { notifTexts } from './notifTexts'
+import { notificationTemplates as tpl } from '@/features/notifications/templates'
+import { friendsData } from '@/data/friends'
 
 const sheetBtn = 'btn-3d bg-white text-go-primary border-2 border-go-border border-b-4 !px-3 !py-2.5 !text-[13px] !normal-case !tracking-normal'
 const dangerBtn = 'btn-3d bg-go-danger text-white border-go-danger-dark !px-3 !py-2.5 !text-[13px] !normal-case !tracking-normal'
@@ -160,12 +162,12 @@ export function DemoPanel() {
               </Section>
 
               <Section title="Notificaciones">
-                <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.streakRisk(name(), Math.max(1, A().streak.count || 5)), 'racha en peligro')}>Racha en peligro</button>
+                <button type="button" className={sheetBtn} onClick={() => notify(tpl.streakRisk(name(), Math.max(1, A().streak.count || 5)), 'racha en peligro')}>Racha en peligro</button>
                 <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.leaguePromotion('Plata'), 'liga')}>Liga</button>
-                <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.vacationReminder(), 'vacaciones')}>Vacaciones</button>
+                <button type="button" className={sheetBtn} onClick={() => notify(tpl.vacationReminder(), 'vacaciones')}>Vacaciones</button>
                 <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.vacationMilestone(7), 'hito del desafío')}>Hito del desafío</button>
-                <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.friendNudge('Lucía'), 'amigo')}>Amigo</button>
-                <button type="button" className={sheetBtn} onClick={() => notify(notifTexts.comeback(name()), 'te extraño')}>Te extraño</button>
+                <button type="button" className={sheetBtn} onClick={() => notify(tpl.friendNudge(friendsData[3]?.name ?? 'Lucía'), 'amigo')}>Amigo</button>
+                <button type="button" className={sheetBtn} onClick={() => notify(tpl.comeback(name()), 'te extraño')}>Te extraño</button>
               </Section>
 
               <Section title="Liga">

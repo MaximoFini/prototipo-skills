@@ -53,13 +53,7 @@ function finishWeek(forced: boolean) {
   liveBoostMs = 0
   const closed = closeWeek(synced, nextWs, nextElapsed)
   bumpLeagueClose()
-  const patchAch = closed.tier >= 2 && league.tier < 2
-  s.patch((st) => ({
-    league: closed,
-    ...(patchAch && (st.achievements['gold-league']?.level ?? 0) < 1
-      ? { achievements: { ...st.achievements, 'gold-league': { level: 1, unlockedAt: now() } } }
-      : {}),
-  }))
+  s.patch({ league: closed })
   const r = closed.lastResult
   if (r?.outcome === 'promoted') s.pushNotification(notifTexts.leaguePromotion(LEAGUE_TIERS[Math.min(MAX_TIER, r.to)].name))
   else if (r?.outcome === 'demoted') s.pushNotification(notifTexts.leagueDemotion(LEAGUE_TIERS[Math.max(0, r.to)].name))
