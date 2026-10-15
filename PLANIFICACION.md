@@ -1,207 +1,301 @@
-# Planificación — App de práctica tipo Duolingo para Skills (Córdoba Capital)
+# Planificación — **Skills Go** (PWA tipo Duolingo para Skills English Institute, Córdoba)
 
-> Documento vivo. Se actualiza a medida que charlamos. Estado: **BORRADOR v0.4 — manual de marca v0.1 creado**.
-> Documento hermano (a crear después): `MANUAL_DE_MARCA.md`.
+> Documento vivo y **fuente única de verdad** para implementar el prototipo (lo van a leer los subagentes).
+> Estado: **v1.0 — alcance cerrado, pendiente de aprobación final para implementar.**
+> Documento hermano: [`MANUAL_DE_MARCA.md`](./MANUAL_DE_MARCA.md) (colores, tipografía, tono, componentes).
 
 ---
 
 ## 1. Contexto y objetivo
 
-- **Cliente:** Skills, academia de inglés en Córdoba Capital, Argentina.
-- **Qué es:** una app de práctica de inglés gamificada (estilo Duolingo) con la marca de Skills.
-- **Para qué:** se lanza en las **vacaciones** (receso de verano / invierno) para **mejorar la retención de alumnos**: que no "desconecten" del inglés ni abandonen la academia entre ciclos.
-- **Qué estamos haciendo ahora:** un **prototipo** para acompañar el **presupuesto**. No es el producto final: es una demostración convincente de lo que el cliente va a recibir.
+- **Cliente:** Skills English Institute (Av. Elías Yofre 1079, Barrio Jardín, Córdoba). +25 años. Firma: *Building Skills*.
+- **Producto:** **Skills Go**, PWA de práctica de inglés gamificada, **calco funcional de Duolingo** con la marca de Skills.
+- **Público:** adolescentes de **12 a 18 años** (alumnos de la academia).
+- **Para qué:** se lanza en las **vacaciones** para **mejorar la retención**: que el alumno no desconecte del inglés ni abandone entre ciclos.
+- **Qué es este entregable:** un **prototipo navegable** para acompañar el presupuesto. Datos mock, sin backend. Tiene que "sentirse real".
+- **Prioridad:** velocidad de entrega. Se implementa **todo de una vez con Claude + subagentes** (sección 10).
 
-### Objetivo del prototipo
-1. Que el cliente **vea y toque** la experiencia (se enamore de la idea).
-2. Que justifique el presupuesto: se ve qué es MVP, qué es fase 2 y qué cuesta cada cosa.
-3. Que demuestre cómo la app **ataca la retención** (rachas, recordatorios, ligas, panel para la academia).
-
-### Métrica de éxito del producto real (para argumentar en el presupuesto)
-- % de alumnos activos durante las vacaciones.
-- Racha promedio / días activos por semana.
-- % de alumnos que se re-inscriben al ciclo siguiente (vs. año anterior).
+### Qué tiene que lograr el prototipo
+1. Que el cliente lo **toque en el celular** y diga "quiero esto".
+2. Que muestre **cómo ataca la retención** (racha, corazones, liga, misiones, desafío de vacaciones, recordatorios, dashboard).
+3. Que sirva de base creíble para el presupuesto (lo que se ve = alcance; lo que no se ve = fase 2).
 
 ---
 
-## 2. Usuarios
+## 2. Decisiones tomadas (registro)
 
-| Rol | Qué necesita | En el prototipo |
-|---|---|---|
-| **Alumno** | Practicar cada día en 5–10 min, sentir progreso, mantener la racha | Sí, es el foco |
-| **Docente** | Ver quién practica, asignar contenido, reforzar | Versión liviana (solo lectura) |
-| **Administración / Dirección** | Ver retención, engagement, alumnos en riesgo | Dashboard demo con datos ficticios |
-
----
-
-## 3. Propuesta de alcance (a discutir)
-
-### 3.1 Núcleo — DEBE estar en el prototipo (MVP demo)
-
-**Alumno**
-- [ ] Onboarding: elegir nivel (o test corto de ubicación) y meta diaria.
-- [ ] Login simulado (sin backend real).
-- [ ] **Mapa de unidades/lecciones** (camino tipo Duolingo) con bloqueo/desbloqueo.
-- [ ] **Lecciones** con 6–8 ejercicios cada una. Tipos de ejercicio a incluir:
-  - Opción múltiple
-  - Completar la oración (fill-in-the-blank)
-  - Ordenar palabras para armar la oración
-  - Traducir (ES→EN y EN→ES) con tolerancia a errores menores
-  - Unir pares (matching)
-  - Escuchar y elegir/escribir (listening con Text-to-Speech del navegador)
-- [ ] Feedback inmediato (correcto/incorrecto + explicación breve).
-- [ ] **Gamificación:** XP, **racha diaria**, vidas/corazones (o alternativa más amable), meta diaria, celebraciones al terminar la lección.
-- [ ] Pantalla de **perfil** con estadísticas y logros/insignias.
-- [ ] **Ranking/Liga semanal** (con alumnos ficticios).
-- [ ] **Recordatorio simulado** ("Tu racha de 5 días está en peligro") — mostrado como mock de notificación.
-
-**Academia**
-- [ ] **Dashboard demo** (vista web de escritorio) con métricas de retención y engagement con datos ficticios realistas.
-
-### 3.2 Deseable — si el tiempo y el presupuesto lo permiten
-- [ ] Modo "Desafío de vacaciones" (campaña con calendario: ej. "21 días de racha = premio en la academia").
-- [ ] Recompensas canjeables en la academia (descuento, merch, clase gratis).
-- [ ] Práctica de pronunciación (reconocimiento de voz).
-- [ ] Repaso espaciado ("Practicá tus errores").
-- [ ] Vista docente para asignar lecciones.
-
-### 3.3 Fuera del prototipo (se menciona en el presupuesto como Fase 2 / producto real)
-- Backend real, base de datos, autenticación real.
-- Notificaciones push reales (PWA / app nativa).
-- Integración con el sistema de gestión de la academia (alumnos, niveles, comisiones).
-- Panel de administración para cargar contenido.
-- Publicación en App Store / Google Play.
-- Pagos, licencias, analytics reales.
-- Contenido pedagógico completo (el prototipo trae solo una muestra).
-
----
-
-## 4. Contenido del prototipo (muestra)
-
-Propuesta mínima para que se vea "lleno" sin ser un proyecto de contenido:
-
-- **2 niveles** de ejemplo (ej. *Beginner / A1* y *Elementary / A2*) — a confirmar con los niveles reales de Skills.
-- **3–4 unidades** por nivel, **2–3 lecciones** por unidad → ~20–30 lecciones jugables, o menos con 1–2 lecciones muy pulidas + el resto "bloqueado".
-- Temas ideales para Argentina/Córdoba: presentaciones, rutina diaria, comida y pedir en un restaurante, viajes, trabajo, etc.
-- Voz en inglés vía **Web Speech API** (gratis, sin backend).
-
-> **Decisión pendiente:** ¿cantidad vs. calidad? Recomendación: **menos lecciones, mejor pulidas** + resto del mapa visible pero bloqueado.
-
----
-
-## 5. Retención: qué mecánicas vamos a mostrar (el corazón de la propuesta)
-
-| Mecánica | Por qué ayuda en vacaciones |
+| Fecha | Decisión |
 |---|---|
-| Racha diaria | Crea hábito; el alumno no quiere "perderla" |
-| Meta diaria flexible (5/10/15 min) | Baja la barrera de entrada |
-| Liga semanal | Competencia social liviana |
-| "Desafío de vacaciones" | Da un objetivo con fecha y premio |
-| Recordatorios | Reactiva al alumno dormido |
-| Logros/insignias | Refuerzo positivo |
-| Dashboard para la academia | La academia detecta alumnos en riesgo y los contacta |
-| Vínculo con la academia (premios, clases) | Conecta el uso de la app con volver a cursar |
+| 2026-10-15 | Público 12–18 años |
+| 2026-10-15 | Niveles estándar CEFR (A1, A2, B1); Skills no tiene los suyos definidos |
+| 2026-10-15 | Nombre: **Skills Go** · Plataforma: **PWA** |
+| 2026-10-15 | Dashboard de academia **incluido** en el prototipo |
+| 2026-10-15 | Vidas/corazones **incluidos**, funcionamiento **calco de Duolingo** |
+| 2026-10-15 | Marca tomada de la web de Skills (capturas + logo); Instagram descartado |
+| 2026-10-15 | Colores extra aprobados: naranja (racha) y amarillo (XP) |
+| 2026-10-15 | **Mascota:** el escudo con expresiones (nombre propuesto: **"Skilly"**) |
+| 2026-10-15 | Tono **estilo Duolingo** (juguetón, con picardía), rioplatense neutro, sin cordobesismos |
+| 2026-10-15 | Sin desglose de presupuesto en este repo; lo hace el usuario |
+| 2026-10-15 | Implementación en una sola pasada con subagentes en paralelo |
 
 ---
 
-## 6. Propuesta técnica (para el prototipo)
+## 3. Alcance funcional (CERRADO)
 
-> Principio: **rápido, mobile-first, sin backend**, fácil de compartir con un link.
+### 3.1 Experiencia del alumno
 
-- **Web app tipo PWA, mobile-first** (se ve como app en el celular, se muestra en desktop con marco de teléfono).
-- **Frontend:** React + Vite + TypeScript + Tailwind (o similar).
-- **Datos:** JSON local (contenido) + `localStorage` (progreso, racha, XP). Sin servidor.
-- **Audio:** Web Speech API (TTS).
-- **Animaciones:** Framer Motion / CSS (celebraciones, feedback).
-- **Deploy:** hosting estático (Vercel / Netlify / GitHub Pages) → un link para mandar al cliente.
-- **Dashboard de academia:** misma app, ruta `/admin` con datos mock.
+**A. Entrada**
+- Splash (escudo + "Skills Go" + *Building Skills*).
+- Onboarding estilo Duolingo: mascota habla → "¿Cómo te llamás?" → "¿Cuál es tu nivel?" (**Empezar desde cero** / **Hacer test de nivel**) → "¿Cuánto querés practicar por día?" (Casual 5 min = 10 XP · Regular 10 min = 20 XP · Serio 15 min = 30 XP · Intenso 20 min = 50 XP) → permiso de notificaciones (mock) → arranca la primera lección.
+- Login/registro **simulado** (nombre + avatar; sin contraseña real). Perfil demo precargado como atajo.
+- **Test de nivel**: 8 preguntas de dificultad creciente que ubican en A1, A2 o B1.
 
-Alternativas consideradas:
-- *Figma clickeable*: más rápido pero no se "siente" real; descartado salvo que se prefiera.
-- *App nativa (Flutter/React Native)*: sobredimensionado para un prototipo.
+**B. Aprender (pantalla principal)**
+- Header fijo: curso, racha (llama), XP del día / gemas, corazones.
+- **Mapa de unidades** con camino sinuoso. Nodos **con forma de escudo** (activo, completado dorado, bloqueado gris cinta).
+- Cabecera de unidad con **cinta verde** (título + descripción).
+- Mascota "Skilly" parada junto al nodo activo con globito.
+- Cofres de recompensa en el camino (gemas/XP).
+- Bloqueo/desbloqueo secuencial. Tocar un nodo abre popup "Empezar +10 XP".
 
----
+**C. Lección (núcleo del producto)** — tipos de ejercicio en 3.3
+- Pantalla completa: ✕ para salir (con confirmación "¿Seguro? perdés tu progreso"), **barra de progreso**, **corazones**.
+- 8–10 ejercicios por lección. Botón **COMPROBAR** deshabilitado hasta responder.
+- **Panel de feedback inferior** (verde correcto / rojo incorrecto) con respuesta correcta, explicación breve y botón **CONTINUAR**. Mensaje aleatorio según el tono del manual.
+- Errores: se pierde **1 corazón**; el ejercicio fallado **se repite al final** de la lección (como Duolingo).
+- Racha de aciertos dentro de la lección ("¡3 seguidas!") con efecto.
+- **0 corazones** → se corta la lección y aparece el modal **"¡Te quedaste sin vidas!"** (ver 3.2).
+- **Pantalla de fin de lección:** mascota festejando, XP ganado, precisión %, tiempo, bono por "lección perfecta" y por rapidez; si fue la primera del día → animación de **racha extendida** con calendario semanal.
+- Botón de **sonido/altavoz** en frases de inglés (TTS) y modo "lento".
 
-## 7. Pantallas (primer listado)
+**D. Corazones (calco Duolingo)**
+- Máximo **5**. Se pierde 1 por error. Regeneran **1 cada 5 h** (en el demo se acelera con el panel de demo, ver 3.5).
+- Sin corazones: modal con salidas: **Practicar para ganar 1 corazón** (lección corta de repaso de errores), **Recargar con 350 gemas**, **Esperar** (cuenta regresiva) o volver al inicio.
+- Con corazones llenos, el repaso no consume vidas.
 
-**Alumno:** Splash/Bienvenida → Onboarding (nivel, meta) → Home/Mapa → Lección (ejercicios) → Resultado de lección → Perfil → Liga → Logros → Configuración.
-**Academia:** Dashboard (retención, rachas, alumnos activos, alumnos en riesgo) → Detalle de alumno/grupo (mock).
+**E. Gamificación**
+- **XP** por lección (10 base + 5 perfecta + 3 rápida), **gemas** por lecciones, misiones y cofres.
+- **Racha** diaria con llama (naranja), calendario de racha, **congelar racha** (comprable con gemas), alerta "tu racha está en peligro".
+- **Meta diaria** configurable con aro de progreso y celebración al cumplirla.
+- **Misiones diarias** (3 por día: "Ganá 30 XP", "Completá 2 lecciones", "Hacé una lección sin errores") con barra y cofre al completar. **Misión del mes** de vacaciones.
+- **Liga semanal** (pestaña propia): 30 participantes (alumnos ficticios con nombres de adolescentes argentinos), **Bronce → Plata → Oro → Zafiro → Rubí**, el **top 10 asciende**, los **últimos 5 descienden**, cuenta regresiva hasta el domingo. Los bots suman XP durante el demo.
+- **Logros** (≈ 20): primera lección, racha 3/7/14/21, 100 XP, lección perfecta, 10 lecciones, madrugador/noctámbulo, liga de oro, etc., con niveles bronce/plata/oro.
+- **Tienda**: recargar corazones, congelar racha, doble XP por 15 min.
 
----
+**F. Skills Go especial: Desafío de Vacaciones (diferencial de retención)**
+- Campaña con fecha: **"21 días de racha"** (calendario con casillero por día + premios por hitos: día 7, 14, 21).
+- **Premios Skills** canjeables **en la academia** (mock): clase de conversación gratis, descuento en la próxima cuota, merch Skills, entrada a evento. Cada premio con código/ID simulado en Perfil → "Mis premios".
+- Banner en la pantalla principal y mensajes de la mascota.
+- Compartir progreso (mock que genera una imagen para Instagram/WhatsApp).
 
-## 8. Preguntas abiertas (necesito tu input)
+**G. Perfil y estadísticas**
+- Avatar, nombre, nivel, "en Skills desde", racha, XP total, liga, logros destacados.
+- Estadísticas: lecciones, XP semanal (gráfico), palabras aprendidas, precisión.
+- **Amigos** (mock): compañeros de comisión, seguir, ver su racha, "amigo de racha".
+- Configuración: meta diaria, sonidos, notificaciones, cerrar sesión, borrar progreso.
 
-> Ronda 1 respondida (ver sección 10). Resuelto en ronda 2: nombre (Skills Go) y plataforma (PWA). Marca: ver `MANUAL_DE_MARCA.md` (pendiente solo Instagram).
+**H. Práctica**
+- **"Practicá tus errores"**: repaso con ejercicios fallados (da XP, no gasta corazones, recupera 1).
+- Lista de **vocabulario aprendido** con audio.
 
-<details><summary>Preguntas originales</summary>
+**I. Recordatorios (simulados)**
+- **Notificación push mock** (banner estilo sistema dentro del demo) disparable desde el panel de demo, con la mascota y tono Duolingo.
+- Pantalla de **ajustes de recordatorio** (hora, días).
 
-1. **Plataforma:** ¿el cliente espera ver algo en el celular (PWA/link) o basta una demo en pantalla? ¿La app final sería app nativa o web/PWA?
-2. **Público:** ¿niños, adolescentes, adultos o todos? Cambia mucho el tono, la estética y los ejercicios.
-3. **Niveles de Skills:** ¿cómo los llaman? ¿Siguen un libro/método (Cambridge, Oxford, propio)? ¿Cuántos niveles hay?
-4. **Marca:** ¿tenés logo, colores, tipografías, o hay que armar el manual de marca desde cero? (ver `MANUAL_DE_MARCA.md`)
-5. **Idioma de la interfaz:** ¿en español rioplatense (voseo) con el inglés como contenido? (asumo que sí).
-6. **Alcance del dashboard de academia:** ¿lo incluimos en el prototipo o lo dejamos solo como mención en el presupuesto?
-7. **Vidas/corazones:** ¿mantenemos el sistema de vidas (frustra a algunos) o usamos algo más amable?
-8. **Tiempo/entrega:** ¿cuándo necesitás el prototipo? ¿Cuándo tiene que estar el producto real (inicio de vacaciones)?
-9. **Presupuesto:** ¿querés que además de esto armemos el desglose de fases/horas para el presupuesto en este mismo repo?
-10. **Nombre de la app:** ¿"Skills App", algo propio tipo "Skills Go", "Skills Vacation"?
+### 3.2 Reglas de negocio (comportamiento exacto)
 
-</details>
-
----
-
-## 9. Próximos pasos
-
-1. Responder las preguntas abiertas y ajustar el alcance (esta doc).
-2. Definir el `MANUAL_DE_MARCA.md` (colores, tipografía, tono de voz, logo, componentes).
-3. Cerrar listado de ejercicios, contenido de muestra y pantallas.
-4. Armar un plan de implementación por etapas.
-5. Implementar el prototipo.
-6. Armar el desglose Prototipo → MVP → Producto final para el presupuesto.
-
----
-
-## 10. Registro de decisiones
-
-| Fecha | Decisión | Motivo |
-|---|---|---|
-| 2026-10-15 | Se crea el documento de planificación | Planificar antes de implementar |
-| 2026-10-15 | Público: adolescentes de 12 a 18 años | Define tono, estética y temas de contenido |
-| 2026-10-15 | Niveles estándar (CEFR: A1, A2, B1…) por ahora | Skills no tiene definidos aún los suyos; se ajusta después |
-| 2026-10-15 | Manual de marca se arma desde la web e Instagram de Skills | El cliente no tiene manual formal |
-| 2026-10-15 | Dashboard de academia **incluido** en el prototipo | Es el argumento de retención para el cliente |
-| 2026-10-15 | Vidas/corazones **incluidos**; el funcionamiento debe ser un calco de Duolingo | Gráfico y reconocible |
-| 2026-10-15 | Prioridad: velocidad de entrega | Se implementa todo con Claude |
-| 2026-10-15 | Sin desglose de presupuesto en este repo | Lo arma el usuario aparte |
-| 2026-10-15 | Nombre de la app: **Skills Go** | Definido por el usuario |
-| 2026-10-15 | Plataforma: **PWA** (instalable, mobile-first) | Definido por el usuario |
-| 2026-10-15 | Fuentes de marca: skillsedu.com.ar e Instagram @skillsenglishinstitute | Bloqueadas por la red del entorno; pendiente de capturas/logo o abrir dominios |
-| 2026-10-15 | Manual de marca v0.1 creado desde capturas de la web y el logo | Colores: verde `#00522E`, rojo `#B8252B`; ver `MANUAL_DE_MARCA.md` |
-| 2026-10-15 | Propuestas de marca a validar: mascota-escudo, nodos con forma de escudo, naranja de racha y amarillo de XP | Necesarios para el feeling Duolingo; no son de la marca madre |
-| 2026-10-15 | Implementación en una sola pasada con subagentes en paralelo | Ver sección 11 |
-
----
-
-## 11. Plan de implementación (una sola pasada, con subagentes)
-
-Para que sea paralelizable sin pisarse, primero se fijan los **contratos compartidos** y después cada subagente toma un módulo con archivos propios.
-
-**Fase 0 — Fundaciones (secuencial, la hago yo):**
-- Scaffold del proyecto (Vite + React + TS + Tailwind), rutas, estructura de carpetas.
-- Design tokens de `MANUAL_DE_MARCA.md` (colores, tipografía, radios, sombras) como tema Tailwind.
-- Tipos de datos compartidos (`Lesson`, `Exercise`, `UserProgress`, etc.) y store de progreso (`localStorage`).
-
-**Fase 1 — Módulos en paralelo (subagentes):**
-| Subagente | Entrega |
+| Regla | Valor |
 |---|---|
-| A. Motor de lección | Los 6 tipos de ejercicio, validación, feedback, corazones, XP, pantalla de resultado |
-| B. Mapa + onboarding + perfil | Camino de unidades, bloqueos, test de nivel, meta diaria, perfil, logros |
-| C. Gamificación y retención | Racha, liga semanal, notificación simulada, desafío de vacaciones, animaciones |
-| D. Contenido | JSON de lecciones para 2–3 niveles CEFR con temas para 12–18 años |
-| E. Dashboard academia | Ruta `/admin` con métricas y datos mock realistas |
+| Corazones máximos / iniciales | 5 / 5 |
+| Pérdida por error | 1 |
+| Regeneración | 1 cada 5 h (acelerable en demo) |
+| Repaso con corazones llenos | no consume |
+| Recarga completa | 350 gemas |
+| Práctica para ganar corazón | 1 lección corta (5 ejercicios) → +1 corazón |
+| Gemas por lección | 5 (+5 si es perfecta) |
+| Cofre de misión | 10–30 gemas |
+| Congelar racha | 200 gemas; cubre 1 día sin práctica |
+| Racha | +1 por día con ≥ 1 lección completada; se corta tras 1 día sin actividad (salvo congelador) |
+| Meta diaria | XP objetivo elegido en onboarding |
+| Liga: ascenso / descenso | Top 10 / últimos 5 |
+| Cierre de semana de liga | domingo 23:59 (en demo: botón "Cerrar semana") |
 
-**Fase 2 — Integración y QA (secuencial):**
-- Unificar, correr build/lint, probar flujos con Playwright en viewport móvil, pulir, deploy estático.
+### 3.3 Tipos de ejercicio
 
-**Calco de Duolingo (referencia de comportamiento):**
-5 corazones, se pierde uno por error, a 0 corazones se corta la lección; se recuperan con tiempo o con práctica; barra de progreso en la lección; botón Comprobar/Continuar con panel verde/rojo; sonidos y celebración al terminar; racha con llama; XP por lección; ligas semanales con ascenso y descenso.
+| # | Tipo | Dinámica | Notas |
+|---|---|---|---|
+| 1 | **Elegir traducción** | Frase en inglés, 3–4 opciones en español (o al revés) | Con audio |
+| 2 | **Armar la oración** | Banco de palabras tocables, se acomodan en la línea | Distractores; acepta variantes válidas |
+| 3 | **Escribir la traducción** | Input libre ES→EN | Tolerancia a mayúsculas/puntuación/acentos; "casi correcto" con 1 typo |
+| 4 | **Unir pares** | 5 pares inglés ↔ español | Audio al tocar |
+| 5 | **Escuchar y escribir** | Reproduce audio y el alumno escribe | TTS, botón "lento" |
+| 6 | **Escuchar y elegir** | Audio → elegir la frase correcta | |
+| 7 | **Completar el hueco** | Frase con espacio y opciones | Gramática en contexto |
+| 8 | **Elegir la imagen** | Palabra en inglés + 4 imágenes | Vocabulario; emojis aceptables como ilustración de contenido (no para UI) |
+| ⊕ | **Hablar (mock)** | "Decí esta frase": micrófono que simula reconocimiento | Opcional, con "omitir"; marcado como *mock* |
+
+### 3.4 Contenido (muestra jugable)
+
+Criterio: **calidad sobre cantidad**, pero que se vea lleno. Temas pensados para adolescentes argentinos.
+
+| Nivel | Unidades | Lecciones | Estado |
+|---|---|---|---|
+| **A1 Starter** | 1. *Hello!* (saludos, presentaciones) · 2. *Me & my world* (familia, amigos, edad, números) · 3. *My day* (rutina, hora, escuela) · 4. *Food & hangouts* (comida, pedir, gustos) | 3 por unidad = **12** | **Jugable completo** |
+| **A2 Elementary** | 5. *Weekend plans* · 6. *Social media & tech* | 2 por unidad = **4** | Jugable |
+| **B1 Intermediate** | 7. *Travel & dreams* | 1 jugable, resto visible bloqueado | Parcial |
+| **Total** | 7 unidades | **≈ 17 lecciones · ≈ 150 ejercicios** | |
+
+- Cada lección: 8–10 ejercicios mezclando tipos, con **explicación en español** de cada respuesta.
+- **Test de nivel**: banco aparte de 8 preguntas.
+- Audio: **Web Speech API** (voz en inglés del dispositivo).
+
+### 3.5 Panel de demo (para presentarle al cliente)
+
+Botón oculto (triple tap en el logo) que abre atajos para mostrar todo sin esperar:
+- Simular **paso de días** (+1 día: ver racha/ruptura).
+- **0 corazones** / **llenar corazones** / **acelerar regeneración**.
+- Dar **XP / gemas**.
+- **Disparar notificación** mock (racha en peligro, liga, desafío de vacaciones).
+- **Cerrar semana de liga** (ver ascenso/descenso).
+- **Completar la lección** actual (atajo).
+- **Resetear** datos / cargar perfil **"Alumno con 12 días de racha"**.
+- Ir al **Dashboard de la academia**.
+
+### 3.6 Panel de la academia (`/admin`, vista web de escritorio)
+
+Login simulado ("Dirección" / "Docente"). Datos ficticios coherentes con la app (≈ 120 alumnos, 8 comisiones).
+- **KPIs:** alumnos activos hoy/semana/mes · **tasa de retención en vacaciones** · racha promedio · lecciones/día · XP semanal · alumnos en el Desafío de Vacaciones.
+- **Gráficos:** actividad diaria (línea), activos por comisión (barras), distribución de rachas (histograma), retención por cohorte vs. año anterior.
+- **Alumnos en riesgo:** tabla con quienes llevan 3+ días sin practicar, racha perdida, última actividad, con botón **"Enviar mensaje"** (mock de WhatsApp) y semáforo de riesgo.
+- **Ranking de comisiones** y de docentes (participación).
+- **Detalle de alumno:** actividad, racha, progreso por unidad, premios canjeados.
+- **Campaña:** progreso del Desafío de Vacaciones, premios canjeados, costo estimado.
+- Estética de la web de Skills (header blanco con logo, barra negra, cards verdes, botón rojo); gráficos con la paleta de marca siguiendo la skill `dataviz`.
+- **Exportar CSV** (mock).
+
+### 3.7 Fuera del prototipo (Fase 2 en el presupuesto)
+- Backend real, base de datos, autenticación real, sincronización multi-dispositivo.
+- **Notificaciones push reales** (Web Push / FCM, programadas por servidor).
+- Integración con el sistema de gestión de la academia (alumnos, comisiones, cuotas, pagos).
+- Panel de **carga y edición de contenido** (CMS) por docentes.
+- Reconocimiento de voz real, pronunciación con IA.
+- Repaso espaciado con algoritmo completo (el prototipo hace un repaso simple).
+- Publicación en App Store / Google Play (o PWA empaquetada).
+- Analítica real, A/B testing, moderación y seguridad de menores (consentimiento parental, privacidad).
+- Contenido pedagógico completo de todos los niveles.
+- Modo oscuro e interfaz multi-idioma.
+
+---
+
+## 4. Arquitectura técnica
+
+| Capa | Elección |
+|---|---|
+| Framework | **React 18 + Vite + TypeScript** |
+| Estilos | **Tailwind CSS** con tokens de `MANUAL_DE_MARCA.md` |
+| Estado | **Zustand** con persistencia en `localStorage` |
+| Rutas | React Router |
+| Animación | Framer Motion (+ confeti ligero) |
+| PWA | `vite-plugin-pwa` (manifest, service worker, offline, instalable) |
+| Audio | Web Speech API (TTS) + sonidos sintetizados con WebAudio (sin archivos) |
+| Gráficos (admin) | Recharts |
+| Íconos | Lucide + íconos de juego propios en SVG (corazón, llama, rayo, gema, cofre, escudo) |
+| Fuentes | Gabarito + Roboto vía `@fontsource` (offline) |
+| Tests | Vitest (lógica de ejercicios, corazones, racha, liga) + Playwright (flujos en viewport móvil) |
+| Deploy | Hosting estático → un link para el cliente |
+
+**Estructura propuesta**
+```
+src/
+  app/            # router, layout, providers
+  design/         # tokens, componentes UI base (Button, Chip, Progress, Panel...)
+  assets/         # svg del escudo, íconos, mascota (Skilly)
+  data/           # contenido: levels/*.json, placement.json, bots, admin mock
+  domain/         # tipos, motor de ejercicios, reglas (hearts, streak, xp, league, quests)
+  store/          # zustand (progress, settings, demo)
+  features/
+    onboarding/ placement/ path/ lesson/ results/
+    gamification/ (quests, achievements, shop, streak)
+    league/ profile/ friends/ vacation/ practice/ notifications/
+    demo/         # panel de demo
+    admin/        # dashboard
+public/           # íconos PWA, manifest
+```
+
+**Contrato de datos compartido (Fase 0)** — tipos en `src/domain/types.ts`:
+`Level`, `Unit`, `Lesson`, `Exercise` (unión discriminada por `type`), `Answer`, `LessonResult`, `UserState` (hearts, gems, xp, streak, goal, completed, mistakes, quests, achievements, league), `League`, `Quest`, `Reward`, `AdminStudent`.
+
+---
+
+## 5. Pantallas (inventario final)
+
+**Alumno:** Splash · Onboarding (6 pasos) · Test de nivel · Aprender (mapa) · Popup de nodo · Lección (8 tipos) · Fin de lección · Racha extendida · Sin vidas · Tienda · Misiones · Liga · Fin de semana de liga · Logros · Perfil · Estadísticas · Amigos · Mis premios · Desafío de vacaciones · Práctica · Vocabulario · Configuración · Ajustes de recordatorio · Notificación (mock) · Panel de demo.
+**Academia:** Login · Resumen · Alumnos · Alumnos en riesgo · Comisiones · Detalle de alumno · Campaña.
+
+---
+
+## 6. Criterios de aceptación (definición de "listo")
+
+1. Se instala como PWA en Android/iOS y funciona **offline** (después de la primera carga).
+2. Se completa una lección A1 de punta a punta con los 8 tipos de ejercicio.
+3. Los **corazones** se pierden, se corta la lección con 0, y se recuperan por práctica/gemas/tiempo.
+4. **Racha, XP, meta diaria, misiones y liga** persisten tras recargar la página.
+5. El test de nivel ubica correctamente a A1/A2/B1.
+6. El **panel de demo** permite recorrer todos los casos en menos de 5 minutos.
+7. Dashboard `/admin` con KPIs, gráficos y alumnos en riesgo, coherente con los datos de la app.
+8. Respeta el manual de marca (colores, tipografía, tono, componentes) y pasa **contraste AA**.
+9. Build sin errores, tests de dominio en verde, sin warnings de lint.
+10. Se ve bien de 360×640 a 430×932; en desktop se muestra dentro de un marco de teléfono.
+
+---
+
+## 7. Guion de presentación del prototipo (5 min)
+
+1. Abrir en el celular → instalar → splash con escudo.
+2. Onboarding rápido → primera lección: acertar, equivocarse (corazón), terminar con festejo y racha.
+3. Mapa, misiones, liga, logros.
+4. **Panel de demo:** quedarse sin corazones → modal → práctica para recuperar.
+5. Notificación "tu racha está en peligro".
+6. **Desafío de Vacaciones** y premios canjeables en la academia.
+7. Saltar al **Dashboard**: retención, alumnos en riesgo, "Enviar mensaje".
+8. Cierre: *"Tu inglés no se toma vacaciones."*
+
+---
+
+## 8. Riesgos y supuestos
+
+- **Calco funcional ≠ copia de assets:** se replica el comportamiento, no se usa material de Duolingo (mascota, fuentes, sonidos, textos). Todo es propio de Skills Go.
+- **TTS depende del dispositivo:** si no hay voz inglesa, mostrar aviso y el texto igual.
+- **iOS PWA:** el push real no está en el prototipo (es mock); instalación manual con "Compartir → Agregar a inicio".
+- **Contenido pedagógico:** es una muestra; Skills debería validarlo antes de producción.
+- **Datos de menores:** en producción hay temas legales (consentimiento, privacidad); fuera del prototipo pero a mencionar en el presupuesto.
+- **Logo:** falta SVG limpio y versión reversa; se re-traza en Fase 0.
+
+---
+
+## 9. Decisiones pendientes (mínimas)
+
+- [ ] Nombre definitivo de la mascota: **"Skilly"** (propuesto).
+- [ ] Hosting para el link de demo: Vercel / Netlify / GitHub Pages (recomiendo GitHub Pages por estar el repo ahí; se decide en Fase 2).
+- [ ] Premios Skills a mostrar (placeholder: clase de conversación gratis, 10 % de descuento en cuota, remera Skills, entrada a evento).
+
+---
+
+## 10. Plan de implementación (una sola pasada, subagentes en paralelo)
+
+**Fase 0 — Fundaciones (yo, secuencial):** scaffold Vite+React+TS+Tailwind, PWA, tokens de marca, componentes UI base, SVG del escudo + Skilly (mascota con 6 expresiones), íconos de juego, tipos y contrato de datos, store con persistencia, reglas de dominio (corazones, racha, XP, misiones, liga) con tests.
+
+**Fase 1 — Módulos en paralelo (cada uno con archivos propios, sin pisarse):**
+
+| Subagente | Dueño de | Entrega |
+|---|---|---|
+| **A. Motor de lección** | `features/lesson`, `features/results` | 8 tipos de ejercicio, validación/tolerancia, panel de feedback, corazones, repetición de errores, fin de lección, sin vidas |
+| **B. Mapa, onboarding, test de nivel, perfil** | `features/onboarding`, `placement`, `path`, `profile`, `friends` | Camino con nodos-escudo, onboarding, test, perfil, estadísticas, configuración |
+| **C. Gamificación y retención** | `features/gamification`, `league`, `vacation`, `notifications`, `practice`, `demo` | Misiones, logros, tienda, liga con bots, racha, desafío de vacaciones, premios, práctica de errores, notificaciones mock, panel de demo |
+| **D1. Contenido A1** | `data/levels/a1.*` | 12 lecciones jugables + test de nivel |
+| **D2. Contenido A2/B1** | `data/levels/a2.*`, `b1.*` | 5 lecciones + unidades bloqueadas |
+| **E. Dashboard academia** | `features/admin`, `data/admin` | Todas las vistas de 3.6 con datos mock coherentes |
+
+**Fase 2 — Integración y QA (yo, secuencial):** unir, `build`/`lint`/`typecheck`, Vitest, flujos con Playwright en móvil, revisión contra el manual de marca y los criterios de la sección 6, íconos PWA, deploy estático y entrega del link.
+
+**Reglas para los subagentes:** leer `PLANIFICACION.md` y `MANUAL_DE_MARCA.md` antes de empezar; usar solo componentes y tokens de `src/design`; no editar archivos fuera de su carpeta; tipos solo de `src/domain/types.ts` (si falta algo, avisar); español rioplatense con tono Duolingo; sin dependencias nuevas sin avisar.
