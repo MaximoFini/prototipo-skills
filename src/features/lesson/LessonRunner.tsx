@@ -1,8 +1,19 @@
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { X } from 'lucide-react'
 import type { Exercise, RunnerResult } from '@/domain/types'
+import { Button, FlameIcon, HeartIcon, Modal, ProgressBar } from '@/design'
+import { useApp } from '@/store/useApp'
+import { now } from '@/domain/clock'
+import { sfx } from '@/lib/sfx'
+import { evaluate, type AnswerValue, type Evaluation } from './evaluate'
+import { buildResult, currentItem, initLesson, lessonReducer, progressPct } from './lessonReducer'
+import { ExerciseView } from './exercises/ExerciseView'
+import { CORRECT_MESSAGES, FeedbackPanel, WRONG_MESSAGES, pick } from './FeedbackPanel'
 
 /**
- * CONTRATO (lo implementa el subagente A). Motor de ejercicios reutilizable por
- * Lección, Test de nivel (B) y Práctica (C).
+ * Motor de ejercicios reutilizable (lección, práctica, test de nivel).
+ * La lógica de cola/estado vive en `lessonReducer.ts` (pura y testeada).
  */
 export interface LessonRunnerProps {
   exercises: Exercise[]
@@ -16,6 +27,161 @@ export interface LessonRunnerProps {
   /** Se llama cuando el alumno llega a 0 corazones durante la lección. */
   onOutOfHearts: (result: RunnerResult) => void
 }
-export function LessonRunner(_props: LessonRunnerProps) {
-  return <div className="grid h-full place-items-center text-go-muted">LessonRunner pendiente</div>
+
+export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = true, onExit, onComplete, onOutOfHearts }: LessonRunnerProps) {
+  const reduce = useReducedMotion()
+  const hearts = useApp((s) => s.hearts)
+  const [state, dispatch] = useReducer(lessonReducer, undefined, () =>
+    initLesson(exercises, { consumesHearts, hearts: useApp.getState().hearts }),
+  )
+  const startedAt = useRef(now())
+  const finished = useRef(false)
+
+  const [answer, setAnswer] = useState<AnswerValue | null>(null)
+  const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
+  const [message, setMessage] = useState('')
+  const [confirmExit, setConfirmExit] = useState(false)
+  const [banner, setBanner] = useState<number | null>(null)
+  const bannerTimer = useRef<ReturnType<typeof setTimeout>>()
+  const [heartHit, setHeartHit] = useState(0)
+
+  const item = currentItem(state)
+  const feedback = state.phase === 'feedback'
+  const seconds = () => Math.max(0, Math.round((now() - startedAt.current) / 1000))
+
+  // Fin de la cola o corte por corazones.
+  useEffect(() => {
+    if (state.status === 'playing' || finished.current) return
+    finished.current = true
+    const result = buildResult(state, seconds())
+    if (state.status === 'done') onComplete(result)
+    else onOutOfHearts(result)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status])
+
+  useEffect(() => () => clearTimeout(bannerTimer.current), [])
+
+  const proceed = useCallback(() => {
+    setAnswer(null)
+    setEvaluation(null)
+    dispatch({ type: 'continue' })
+  }, [])
+
+  const check = useCallback(() => {
+    if (!item || answer === null || state.phase !== 'answering') return
+    const ev = evaluate(item.ex, answer)
+    setEvaluation(ev)
+    setMessage(pick(ev.correct ? CORRECT_MESSAGES : WRONG_MESSAGES))
+    dispatch({ type: 'answer', correct: ev.correct })
+    if (ev.correct) {
+      sfx.correct()
+      const run = state.streak + 1
+      if (run >= 3) {
+        setBanner(run)
+        window.setTimeout(() => sfx.streak(), 250)
+        clearTimeout(bannerTimer.current)
+        bannerTimer.current = setTimeout(() => setBanner(null), 1800)
+      }
+    } else {
+      sfx.wrong()
+      setBanner(null)
+      if (consumesHearts && useApp.getState().hearts > 0) {
+        useApp.getState().loseHeart()
+        setHeartHit((n) => n + 1)
+        window.setTimeout(() => sfx.heartLost(), 200)
+      }
+    }
+    if (!showFeedback) proceed()
+  }, [item, answer, state.phase, state.streak, consumesHearts, showFeedback, proceed])
+
+  const skip = useCallback(() => {
+    setAnswer(null)
+    dispatch({ type: 'skip' })
+  }, [])
+
+  // Enter = comprobar / continuar.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || confirmExit) return
+      if ((e.target as HTMLElement)?.tagName === 'BUTTON') return
+      e.preventDefault()
+      if (feedback) proceed()
+      else check()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [feedback, confirmExit, proceed, check])
+
+  const verdict = !feedback || !evaluation ? null : evaluation.correct ? 'correct' : 'wrong'
+  const extra =
+    item && (item.ex.type === 'listen-type' || item.ex.type === 'fill-blank') ? item.ex.translation : undefined
+
+  return (
+    <div className="relative flex h-full flex-col bg-white">
+      {/* Cabecera */}
+      <div className="flex items-center gap-3 px-4 pb-2" style={{ paddingTop: 'calc(12px + var(--safe-top))' }}>
+        <button type="button" aria-label="Salir de la lección" onClick={() => setConfirmExit(true)}
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-go-muted hover:bg-go-surface">
+          <X size={26} strokeWidth={3} aria-hidden />
+        </button>
+        <div className="flex-1"><ProgressBar value={progressPct(state)} height={16} /></div>
+        {mode !== 'placement' && (
+          <motion.div key={heartHit} className={`flex min-w-[52px] items-center justify-end gap-1 font-display text-[18px] font-extrabold ${hearts === 0 ? 'text-go-muted' : 'text-go-heart'}`}
+            aria-label={`${hearts} corazones`}
+            initial={heartHit && !reduce ? { scale: 1.5, rotate: -15 } : false} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 12 }}>
+            <HeartIcon size={28} broken={hearts === 0} />
+            <span>{hearts}</span>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Racha de aciertos */}
+      <AnimatePresence>
+        {banner !== null && (
+          <motion.div key="streak" className="pointer-events-none absolute inset-x-0 top-[68px] z-10 flex justify-center"
+            initial={{ opacity: 0, y: reduce ? 0 : -12, scale: reduce ? 1 : 0.8 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }}>
+            <span role="status" className="inline-flex items-center gap-1.5 rounded-full bg-go-text px-4 py-1.5 font-display text-[16px] font-extrabold text-white shadow-lg">
+              <FlameIcon size={20} /> ¡{banner} seguidas!
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Ejercicio */}
+      <div className={`scroll-y flex-1 px-4 pt-4 ${feedback && showFeedback ? 'pb-72' : 'pb-8'}`}>
+        {item && (
+          <motion.div key={`${item.orig}-${item.attempt}`} className={verdict === 'wrong' ? 'animate-shake' : ''}
+            initial={reduce ? false : { opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
+            {item.attempt > 0 && (
+              <p className="mb-2 inline-block rounded-full bg-go-surface px-3 py-0.5 text-[12px] font-bold uppercase tracking-wider text-go-muted">Repaso</p>
+            )}
+            <div className={feedback ? 'pointer-events-none' : ''}>
+              <ExerciseView ex={item.ex} locked={feedback} verdict={verdict} onAnswer={setAnswer} onSkip={skip} />
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Pie: COMPROBAR */}
+      <div className="border-t-2 border-go-border bg-white px-4 pt-3" style={{ paddingBottom: 'calc(16px + var(--safe-bottom))' }}>
+        <Button block disabled={answer === null || feedback} onClick={check}>Comprobar</Button>
+      </div>
+
+      {/* Panel de feedback */}
+      <AnimatePresence>
+        {feedback && showFeedback && evaluation && item && (
+          <FeedbackPanel key="fb" evaluation={evaluation} message={message} explanation={item.ex.explanation} extra={extra} onContinue={proceed} />
+        )}
+      </AnimatePresence>
+
+      <Modal open={confirmExit} onClose={() => setConfirmExit(false)} sheet>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h2 className="font-display text-[24px] font-extrabold text-go-text">¿Seguro?</h2>
+          <p className="mb-3 text-[16px] text-go-muted">Si salís ahora perdés tu progreso de esta lección.</p>
+          <Button block onClick={() => setConfirmExit(false)}>Seguir practicando</Button>
+          <Button block variant="ghost" className="!text-go-danger" onClick={onExit}>Salir</Button>
+        </div>
+      </Modal>
+    </div>
+  )
 }
