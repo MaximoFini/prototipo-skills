@@ -1,6 +1,6 @@
 # Planificación — App de práctica tipo Duolingo para Skills (Córdoba Capital)
 
-> Documento vivo. Se actualiza a medida que charlamos. Estado: **BORRADOR v0.1 — propuesta inicial, pendiente de validar**.
+> Documento vivo. Se actualiza a medida que charlamos. Estado: **BORRADOR v0.2 — decisiones de ronda 1 incorporadas**.
 > Documento hermano (a crear después): `MANUAL_DE_MARCA.md`.
 
 ---
@@ -131,6 +131,10 @@ Alternativas consideradas:
 
 ## 8. Preguntas abiertas (necesito tu input)
 
+> Ronda 1 respondida (ver sección 10). Quedan pendientes: URLs de web e Instagram de Skills, nombre de la app y plataforma/dispositivo de demo.
+
+<details><summary>Preguntas originales</summary>
+
 1. **Plataforma:** ¿el cliente espera ver algo en el celular (PWA/link) o basta una demo en pantalla? ¿La app final sería app nativa o web/PWA?
 2. **Público:** ¿niños, adolescentes, adultos o todos? Cambia mucho el tono, la estética y los ejercicios.
 3. **Niveles de Skills:** ¿cómo los llaman? ¿Siguen un libro/método (Cambridge, Oxford, propio)? ¿Cuántos niveles hay?
@@ -141,6 +145,8 @@ Alternativas consideradas:
 8. **Tiempo/entrega:** ¿cuándo necesitás el prototipo? ¿Cuándo tiene que estar el producto real (inicio de vacaciones)?
 9. **Presupuesto:** ¿querés que además de esto armemos el desglose de fases/horas para el presupuesto en este mismo repo?
 10. **Nombre de la app:** ¿"Skills App", algo propio tipo "Skills Go", "Skills Vacation"?
+
+</details>
 
 ---
 
@@ -160,3 +166,37 @@ Alternativas consideradas:
 | Fecha | Decisión | Motivo |
 |---|---|---|
 | 2026-10-15 | Se crea el documento de planificación | Planificar antes de implementar |
+| 2026-10-15 | Público: adolescentes de 12 a 18 años | Define tono, estética y temas de contenido |
+| 2026-10-15 | Niveles estándar (CEFR: A1, A2, B1…) por ahora | Skills no tiene definidos aún los suyos; se ajusta después |
+| 2026-10-15 | Manual de marca se arma desde la web e Instagram de Skills | El cliente no tiene manual formal |
+| 2026-10-15 | Dashboard de academia **incluido** en el prototipo | Es el argumento de retención para el cliente |
+| 2026-10-15 | Vidas/corazones **incluidos**; el funcionamiento debe ser un calco de Duolingo | Gráfico y reconocible |
+| 2026-10-15 | Prioridad: velocidad de entrega | Se implementa todo con Claude |
+| 2026-10-15 | Sin desglose de presupuesto en este repo | Lo arma el usuario aparte |
+| 2026-10-15 | Implementación en una sola pasada con subagentes en paralelo | Ver sección 11 |
+
+---
+
+## 11. Plan de implementación (una sola pasada, con subagentes)
+
+Para que sea paralelizable sin pisarse, primero se fijan los **contratos compartidos** y después cada subagente toma un módulo con archivos propios.
+
+**Fase 0 — Fundaciones (secuencial, la hago yo):**
+- Scaffold del proyecto (Vite + React + TS + Tailwind), rutas, estructura de carpetas.
+- Design tokens de `MANUAL_DE_MARCA.md` (colores, tipografía, radios, sombras) como tema Tailwind.
+- Tipos de datos compartidos (`Lesson`, `Exercise`, `UserProgress`, etc.) y store de progreso (`localStorage`).
+
+**Fase 1 — Módulos en paralelo (subagentes):**
+| Subagente | Entrega |
+|---|---|
+| A. Motor de lección | Los 6 tipos de ejercicio, validación, feedback, corazones, XP, pantalla de resultado |
+| B. Mapa + onboarding + perfil | Camino de unidades, bloqueos, test de nivel, meta diaria, perfil, logros |
+| C. Gamificación y retención | Racha, liga semanal, notificación simulada, desafío de vacaciones, animaciones |
+| D. Contenido | JSON de lecciones para 2–3 niveles CEFR con temas para 12–18 años |
+| E. Dashboard academia | Ruta `/admin` con métricas y datos mock realistas |
+
+**Fase 2 — Integración y QA (secuencial):**
+- Unificar, correr build/lint, probar flujos con Playwright en viewport móvil, pulir, deploy estático.
+
+**Calco de Duolingo (referencia de comportamiento):**
+5 corazones, se pierde uno por error, a 0 corazones se corta la lección; se recuperan con tiempo o con práctica; barra de progreso en la lección; botón Comprobar/Continuar con panel verde/rojo; sonidos y celebración al terminar; racha con llama; XP por lección; ligas semanales con ascenso y descenso.
