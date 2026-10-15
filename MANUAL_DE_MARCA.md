@@ -1,9 +1,9 @@
 # Manual de marca — Skills English Institute / **Skills Go**
 
-> Versión 0.1 — derivado de la web oficial (skillsedu.com.ar) y del logo provisto por el cliente.
+> Versión 0.2 — derivado de la web oficial (skillsedu.com.ar) y del logo provisto por el cliente.
 > Los colores se **midieron por muestreo de píxeles** sobre las capturas, no salen de un manual oficial: si Skills tiene los códigos exactos (Pantone/HEX), se reemplazan en los tokens y listo.
 > Alcance: marca madre (Skills) + cómo se extiende a la app **Skills Go** (gamificada, público 12–18 años).
-> Pendiente: no pude leer el Instagram (@skillsenglishinstitute) — ver sección 12.
+> Instagram (@skillsenglishinstitute): no se revisó; se decidió usar la web como única referencia (ver sección 12).
 
 Archivos de marca en el repo: `brand/logo-skills-full.png`, `brand/logo-skills-full-transparent.png`, `brand/shield-skills.png`, capturas de referencia en `brand/reference/`.
 
@@ -98,7 +98,7 @@ La gamificación necesita estados que la marca no define. Se derivan de la palet
 | `--go-text` | `#1B1B1B` | Texto principal |
 | `--go-text-muted` | `#6B6360` | Texto secundario |
 
-> **Decisión a validar:** naranja (racha) y amarillo (XP) no son de la marca. Se usan **solo en elementos de gamificación** y nunca en logo, headers ni botones principales. Si Skills prefiere no sumar colores, la alternativa es racha en rojo y XP en gris cinta, a costa de menos "juego".
+> **Decisión aprobada:** naranja (racha) y amarillo (XP) no son de la marca. Se usan **solo en elementos de gamificación** y nunca en logo, headers ni botones principales. Si Skills prefiere no sumar colores, la alternativa es racha en rojo y XP en gris cinta, a costa de menos "juego".
 
 ### 3.3 Reglas de accesibilidad
 - Texto blanco solo sobre `#00522E`, `#B8252B` y `#D21B20` (todos ≥ 5.3 : 1).
@@ -144,7 +144,7 @@ La gamificación necesita estados que la marca no define. Se derivan de la palet
 3. **Banda roja**: banda rectangular roja con texto blanco bold para etiquetas clave (`GO`, `DESAFÍO DE VACACIONES`, `NUEVO`).
 4. **"+25"**: el sello de trayectoria como detalle en perfil, créditos y pantalla de bienvenida ("Más de 25 años construyendo skills").
 5. **Verde sobre foto**: en la web, las fotos llevan un velo verde. En la app se usa en splash, onboarding y campañas.
-6. **Mascota (propuesta, a validar):** el **escudo con ojos y expresiones** (feliz, triste, festejando, durmiendo) como equivalente al búho de Duolingo. Es el elemento emocional clave para la retención (reacciona a la racha, a perder corazones, al terminar la lección).
+6. **Mascota (aprobada):** el **escudo con ojos y expresiones** (feliz, triste, festejando, durmiendo) como equivalente al búho de Duolingo. Es el elemento emocional clave para la retención (reacciona a la racha, a perder corazones, al terminar la lección).
 
 ---
 
@@ -166,7 +166,7 @@ La gamificación necesita estados que la marca no define. Se derivan de la palet
 | Cercano, no infantil | Para 12–18: humor liviano, nada de tono de jardín de infantes |
 | Alentador, nunca humillante | El error enseña, no castiga |
 | Corto | Una idea por mensaje; botones de 1–2 palabras |
-| Cordobés suave (opcional) | Algún guiño ocasional ("¡Qué capo!") — **a validar con el cliente** |
+| Tono Duolingo | **Decidido:** juguetón, con humor y algo de picardía en recordatorios y mascota; español rioplatense neutro, **sin cordobesismos** |
 | Inglés para el contenido, español para la guía | La interfaz va en español; las frases a practicar, en inglés |
 
 ### Microcopy de referencia
@@ -228,10 +228,10 @@ La gamificación necesita estados que la marca no define. Se derivan de la palet
 
 ## 12. Pendientes y supuestos
 
-- [ ] **Instagram** (@skillsenglishinstitute) sin revisar: confirmar que los colores y el estilo de piezas coinciden con la web, y ver si hay una tipografía o ilustración propia en las redes. Si me pasás 3–4 capturas del feed, lo incorporo.
+- [x] **Instagram:** decidido no usarlo; la referencia es la web (capturas provistas).
 - [ ] **HEX/Pantone oficiales:** los de este documento son aproximados (muestreo de capturas).
 - [ ] **Tipografía del logo** y **de los carteles de campaña** inferidas visualmente; confirmar con quien diseñó la marca.
-- [ ] **Naranja de racha y amarillo de XP:** validar con el cliente (ver 3.2).
-- [ ] **Mascota-escudo:** validar si les gusta la idea (ver 6.6).
-- [ ] **Cordobesismos en el copy:** decidir si sí/no y cuánto.
+- [x] **Naranja de racha y amarillo de XP:** aprobados para generar el feeling Duolingo (ver 3.2).
+- [x] **Mascota-escudo:** aprobada (ver 6.6).
+- [x] **Cordobesismos:** no; tono Duolingo.
 - [ ] **SVG del escudo y reversa:** producir en Fase 0 (ver 2.5).
