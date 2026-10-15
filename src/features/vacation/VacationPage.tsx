@@ -138,7 +138,7 @@ export default function VacationPage() {
                 const milestone = (MILESTONE_DAYS as readonly number[]).includes(c.day)
                 const base = 'relative grid aspect-square place-items-center rounded-full font-display text-[15px] font-extrabold'
                 const cls =
-                  c.status === 'done' ? 'bg-go-primary text-white'
+                  c.status === 'done' ? `bg-go-primary text-white ${c.isToday ? 'ring-4 ring-go-xp/60' : ''}`
                   : c.status === 'today' ? 'border-[3px] border-go-primary bg-go-primary-tint text-go-primary ring-4 ring-go-xp/60'
                   : c.status === 'missed' ? 'border-2 border-go-danger/40 bg-go-danger-tint text-go-danger'
                   : 'bg-go-surface text-go-muted'

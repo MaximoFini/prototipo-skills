@@ -64,7 +64,6 @@ const Row = memo(function Row({ entry, pos, animate }: { entry: LeagueEntry; pos
 export default function LeaguePage() {
   const league = useApp((s) => s.league)
   const reduce = useReducedMotion()
-  const [seenResult, setSeenResult] = useState(false)
   const [resultVersion, setResultVersion] = useState(0)
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export default function LeaguePage() {
   }, [])
 
   const result = league.lastResult
-  const showEnd = !!result && !seenResult && !isResultSeen(league.weekStart)
+  const showEnd = !!result && !isResultSeen(league.weekStart)
   // `resultVersion` fuerza a re-evaluar tras marcar como visto
   void resultVersion
 
@@ -87,7 +86,6 @@ export default function LeaguePage() {
         result={result}
         onContinue={() => {
           markResultSeen(league.weekStart)
-          setSeenResult(true)
           setResultVersion((v) => v + 1)
         }}
       />
