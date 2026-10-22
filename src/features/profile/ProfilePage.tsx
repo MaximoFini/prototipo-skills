@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS } from '@/data/achievements'
+import { AchievementBadge } from '@/features/gamification/AchievementBadge'
 import { Link } from 'react-router-dom'
 import { BarChart3, ChevronRight, Gift, Languages, Palmtree, Settings, ShoppingBag, Users } from 'lucide-react'
 import { Avatar, FlameIcon, BoltIcon, ShieldMark, TrophyIcon } from '@/design'
@@ -64,7 +65,7 @@ export default function ProfilePage() {
             ) : (
               unlocked.slice(0, 3).map(([id, a]) => (
                 <div key={id} className="flex flex-1 flex-col items-center gap-1 text-center">
-                  <span className="grid h-12 w-12 place-items-center rounded-full bg-go-xp/30"><TrophyIcon size={28} /></span>
+                  <AchievementBadge icon={ACHIEVEMENTS.find((d) => d.id === id)?.icon ?? 'trophy'} level={a.level} size={46} />
                   <span className="text-[11px] font-bold text-go-muted">{ACHIEVEMENTS.find((d) => d.id === id)?.title ?? id} · {['', 'Bronce', 'Plata', 'Oro'][a.level]}</span>
                 </div>
               ))

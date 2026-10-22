@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { Button, CheckIcon, CrossIcon, FlameIcon } from '@/design'
+import { Button, CheckIcon, CrossIcon, FlameIcon, Skilly } from '@/design'
 import type { Evaluation } from './evaluate'
 
 export const CORRECT_MESSAGES = ['¡Genial!', '¡Bien ahí!', '¡Crack!', 'Perfect!', '¡Eso es!']
@@ -32,6 +32,14 @@ export function FeedbackPanel({ evaluation, message, explanation, extra, onConti
           <FlameIcon size={20} /> ¡{streak} seguidas!
         </motion.span>
       )}
+      {/* Skilly se asoma por el borde del panel: festeja o se pone triste. */}
+      <motion.div aria-hidden className="pointer-events-none absolute bottom-full right-5 -mb-3"
+        initial={reduce ? false : { y: 40, opacity: 0, rotate: ok ? -8 : 8 }} animate={{ y: 0, opacity: 1, rotate: 0 }}
+        transition={{ type: 'spring', damping: 11, stiffness: 260, delay: 0.08 }}>
+        <div className={ok && !reduce ? 'animate-[hop_.6s_ease-in-out_.35s_2]' : ''}>
+          <Skilly mood={ok ? (streak >= 3 ? 'cheer' : 'happy') : 'sad'} size={64} />
+        </div>
+      </motion.div>
       <div className="flex items-start gap-3">
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white ${ok ? 'animate-pop' : ''}`} aria-hidden>
           {ok ? <CheckIcon size={22} /> : <CrossIcon size={20} />}

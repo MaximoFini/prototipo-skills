@@ -4,14 +4,16 @@ import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useApp } from '@/store/useApp'
-import { HOUR, addDays, now, today } from '@/domain/clock'
+import { now } from '@/domain/clock'
 import { HEARTS_MAX, HEART_REGEN_MS } from '@/domain/rules'
 import { allLessons, currentLessonId } from '@/data/content'
-import type { RunnerResult, UserState, VocabItem } from '@/domain/types'
+import type { RunnerResult } from '@/domain/types'
 import { closeLeagueWeek } from '@/features/league/register'
 import { notifTexts } from './notifTexts'
 import { notificationTemplates as tpl } from '@/features/notifications/templates'
 import { friendsData } from '@/data/friends'
+import { loadSofiDemo } from './sofiProfile'
+import { TOUR_EVENT } from './PresentationTour'
 
 const sheetBtn = 'btn-3d bg-white text-go-primary border-2 border-go-border border-b-4 !px-3 !py-2.5 !text-[13px] !normal-case !tracking-normal'
 const dangerBtn = 'btn-3d bg-go-danger text-white border-go-danger-dark !px-3 !py-2.5 !text-[13px] !normal-case !tracking-normal'
@@ -28,34 +30,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 function fmtDate(ts: number): string {
   const txt = new Date(ts).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   return txt.charAt(0).toUpperCase() + txt.slice(1)
-}
-
-/** Estado "Alumno con 12 días de racha" (Sofi). */
-function sofiProfile(): Partial<UserState> {
-  const t = today()
-  const days = Array.from({ length: 12 }, (_, i) => addDays(t, -11 + i))
-  const completed: UserState['completed'] = {}
-  allLessons.slice(0, 6).forEach((l, i) => {
-    completed[l.id] = { count: 1 + (i % 2), bestAccuracy: 80 + ((i * 7) % 21), lastAt: now() - (6 - i) * 24 * HOUR }
-  })
-  const vocab = new Map<string, VocabItem>()
-  for (const l of allLessons.slice(0, 6)) for (const ex of l.exercises) for (const v of ex.vocab ?? []) vocab.set(v.en.toLowerCase(), v)
-  const xpByDay: Record<string, number> = {}
-  const per = [60, 85, 70, 55, 90, 75, 40, 80, 65, 70, 100, 50]
-  days.forEach((d, i) => { xpByDay[d] = per[i] })
-  return {
-    profile: { name: 'Sofi', avatar: 'a3', level: 'A1', onboarded: true, createdAt: now() - 40 * 24 * HOUR, commission: 'Teens 2B' },
-    xp: 840,
-    gems: 420,
-    hearts: HEARTS_MAX,
-    heartsAnchor: now(),
-    xpByDay,
-    streak: { count: 12, best: 12, lastDay: t, freezes: 1, days, frozenDays: [] },
-    completed,
-    vocabulary: [...vocab.values()],
-    vacation: { joined: true, startDay: addDays(t, -11), ownedRewards: [] },
-    stats: { lessonsCompleted: 8, perfectLessons: 3, correct: 62, total: 70, seconds: 1900 },
-  }
 }
 
 export function DemoPanel() {
@@ -141,6 +115,11 @@ export function DemoPanel() {
             </div>
 
             <div className="scroll-y relative flex-1 px-4 pb-6">
+              <Section title="Presentación">
+                <button type="button" className={`btn-3d col-span-2 border-[#C9A02C] bg-go-xp text-go-text !py-2.5 !text-[13px] !normal-case !tracking-normal`}
+                  onClick={() => { setOpen(false); window.dispatchEvent(new Event(TOUR_EVENT)) }}>Modo presentación (recorrido automático)</button>
+              </Section>
+
               <Section title="Tiempo">
                 <p className="col-span-2 rounded-xl bg-go-surface px-3 py-2 text-[13px] text-go-text">
                   Fecha simulada: <b>{fmtDate(now())}</b>{offset > 0 && <span className="text-go-muted"> (+{Math.round(offset / 86400000)} d)</span>}
@@ -198,11 +177,7 @@ export function DemoPanel() {
               <Section title="Perfiles">
                 <button type="button" className={dangerBtn} onClick={() => { A().reset(); setOpen(false); nav('/welcome'); }}>Resetear todo</button>
                 <button type="button" className={sheetBtn} onClick={() => {
-                  A().reset()
-                  A().patch(sofiProfile())
-                  const done = allLessons.slice(5, 6)
-                  done.forEach((l) => A().recordMistakes(l.id, l.exercises.slice(0, 3)))
-                  A().refresh()
+                  loadSofiDemo()
                   flash('Cargado: Sofi, 12 días de racha')
                   nav('/')
                 }}>Alumno con 12 días de racha</button>

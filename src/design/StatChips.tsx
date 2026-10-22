@@ -4,6 +4,7 @@ import { HEARTS_MAX, msToNextHeart, formatCountdown } from '@/domain/rules'
 import { now } from '@/domain/clock'
 import { BoltIcon, FlameIcon, GemIcon, HeartIcon } from '@/assets/icons'
 import { dayKey } from '@/domain/clock'
+import { AnimatedNumber } from './AnimatedNumber'
 
 const base = 'inline-flex items-center gap-1 rounded-full px-1.5 py-1 font-display text-[16px] font-extrabold'
 
@@ -26,7 +27,12 @@ export function StreakChip({ onClick }: { onClick?: () => void }) {
   const done = streak.lastDay === dayKey()
   return (
     <button type="button" onClick={onClick} className={`${base} ${done ? 'text-go-streak-text' : 'text-go-muted'}`} aria-label={`Racha de ${streak.count} días`}>
-      <FlameIcon size={26} off={!done} /><span>{streak.count}</span>
+      {/* Racha hecha hoy: la llama "vive" (titila) y tiene un halo cálido. */}
+      <span className={`relative grid place-items-center ${done ? 'origin-bottom animate-[flicker_1.6s_ease-in-out_infinite]' : ''}`}>
+        {done && <span aria-hidden className="absolute inset-0 rounded-full bg-go-streak/40 blur-md" />}
+        <FlameIcon size={26} off={!done} className="relative" />
+      </span>
+      <AnimatedNumber value={streak.count} />
     </button>
   )
 }
@@ -34,10 +40,10 @@ export function GemChip({ onClick }: { onClick?: () => void }) {
   const gems = useApp((s) => s.gems)
   return (
     <button type="button" onClick={onClick} className={`${base} text-go-gem`} aria-label={`${gems} gemas`}>
-      <GemIcon size={24} /><span>{gems}</span>
+      <GemIcon size={24} /><AnimatedNumber value={gems} />
     </button>
   )
 }
 export function XpChip({ value }: { value: number }) {
-  return (<span className={`${base} text-go-xp-dark`}><BoltIcon size={24} /><span>{value}</span></span>)
+  return (<span className={`${base} text-go-xp-dark`}><BoltIcon size={24} /><AnimatedNumber value={value} /></span>)
 }

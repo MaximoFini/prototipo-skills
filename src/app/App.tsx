@@ -1,9 +1,11 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { useApp } from '@/store/useApp'
-import { BottomNav, PageLoading, PhoneFrame } from '@/design'
+import { BottomNav, NAV_ITEMS, PageLoading, PhoneFrame } from '@/design'
 import { NotificationHost } from '@/features/notifications/NotificationHost'
 import { DemoPanel } from '@/features/demo/DemoPanel'
+import { PresentationTour } from '@/features/demo/PresentationTour'
 
 const Onboarding = lazy(() => import('@/features/onboarding/OnboardingPage'))
 const Placement = lazy(() => import('@/features/placement/PlacementPage'))
@@ -43,10 +45,23 @@ function RequireOnboarding() {
   if (!onboarded) return <Navigate to="/welcome" replace state={{ from: loc.pathname }} />
   return <Outlet />
 }
+/** Pestañas: la pantalla nueva entra deslizándose desde el lado de la pestaña tocada. */
 function WithNav() {
+  const { pathname } = useLocation()
+  const reduce = useReducedMotion()
+  const idx = Math.max(0, NAV_ITEMS.findIndex((i) => i.to === pathname))
+  const prev = useRef(idx)
+  const dir = idx === prev.current ? 0 : idx > prev.current ? 1 : -1
+  useEffect(() => { prev.current = idx }, [idx])
   return (
     <>
-      <main className="min-h-0 flex-1 overflow-hidden"><Outlet /></main>
+      <main className="min-h-0 flex-1 overflow-hidden">
+        <motion.div key={pathname} className="h-full"
+          initial={reduce || !dir ? false : { opacity: 0, x: 28 * dir }} animate={{ opacity: 1, x: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 34 }}>
+          <Outlet />
+        </motion.div>
+      </main>
       <BottomNav />
     </>
   )
@@ -65,6 +80,7 @@ export default function App() {
   useHeartbeat()
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <PresentationTour />
       <Routes>
         <Route path="/admin/*" element={<Suspense fallback={<PageLoading />}><Admin /></Suspense>} />
         <Route element={<Phone />}>

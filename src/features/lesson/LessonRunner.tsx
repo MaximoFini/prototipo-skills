@@ -135,7 +135,12 @@ export function LessonRunner({ exercises, mode, consumesHearts, showFeedback = t
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-go-muted hover:bg-go-surface">
           <X size={26} strokeWidth={3} aria-hidden />
         </button>
-        <div className="flex-1"><ProgressBar value={progressPct(state)} height={16} /></div>
+        <div className="flex-1">
+          {/* Con 3+ aciertos seguidos la barra se pone "en llamas" (naranja con halo). */}
+          <ProgressBar value={progressPct(state)} height={16} shine={!reduce}
+            color={state.streak >= 3 ? 'linear-gradient(90deg, #F2A33A, #F2C94C)' : undefined}
+            glow={state.streak >= 3 ? 'rgba(242,163,58,.55)' : undefined} />
+        </div>
         {mode !== 'placement' && (
           <motion.div key={heartHit} className={`flex min-w-[52px] items-center justify-end gap-1 font-display text-[18px] font-extrabold ${hearts === 0 ? 'text-go-muted' : 'text-go-heart'}`}
             aria-label={`${hearts} corazones`}

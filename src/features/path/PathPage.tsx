@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Dumbbell } from 'lucide-react'
 import {
   Button, CheckIcon, ChestIcon, DemoTrigger, GemChip, GemIcon, HeartChip, LockIcon, Modal, Ribbon, ShieldMark,
   ShieldNode, Skilly, StarIcon, StreakChip, BoltIcon,
 } from '@/design'
 import { VacationBanner } from '@/features/vacation/VacationBanner'
+import { StreakWeek } from '@/features/gamification/StreakWeek'
 import { OutOfHeartsModal } from '@/features/lesson/OutOfHeartsModal'
 import { useApp, selectXpToday } from '@/store/useApp'
 import { allLessons, currentLessonId, levels } from '@/data/content'
@@ -77,6 +78,7 @@ export default function PathPage() {
   const [reward, setReward] = useState<number | null>(null)
   const [hint, setHint] = useState<string | null>(null)
   const [tip, setTip] = useState(false)
+  const [streakOpen, setStreakOpen] = useState(false)
   const activeRef = useRef<HTMLDivElement>(null)
 
   const items = useMemo(buildMap, [])
@@ -132,9 +134,9 @@ export default function PathPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="relative z-20 flex shrink-0 items-center gap-1 border-b-2 border-go-border bg-white px-2 pb-1" style={{ paddingTop: 'calc(8px + var(--safe-top))' }}>
+      <header className="relative z-30 flex shrink-0 items-center gap-1 border-b-2 border-go-border bg-white px-2 pb-1" style={{ paddingTop: 'calc(8px + var(--safe-top))' }}>
         <DemoTrigger className="mr-1 shrink-0 px-1"><ShieldMark size={28} /></DemoTrigger>
-        <StreakChip onClick={() => nav('/profile/stats')} />
+        <StreakChip onClick={() => { sfx.tap(); setStreakOpen((v) => !v) }} />
         <GemChip onClick={() => nav('/shop')} />
         <HeartChip onClick={() => nav('/shop')} />
         <div className="relative ml-auto">
@@ -153,13 +155,23 @@ export default function PathPage() {
             </div>
           )}
         </div>
+        <AnimatePresence>
+          {streakOpen && <StreakWeek onMore={() => nav('/profile/stats')} />}
+        </AnimatePresence>
       </header>
 
       <div className="relative min-h-0 flex-1">
+        <AnimatePresence>
+          {streakOpen && (
+            <motion.button type="button" aria-label="Cerrar racha" onClick={() => setStreakOpen(false)}
+              className="absolute inset-0 z-20 bg-black/25" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+          )}
+        </AnimatePresence>
         <div className="scroll-y h-full pb-28">
           <VacationBanner />
           <div className="pt-2">
             {items.map((it, i) => {
+              const tint = UNIT_TINTS[unitIndexOf(items, i) % UNIT_TINTS.length]
               if (it.kind === 'ribbon') {
                 const unitIdx = levels.flatMap((l) => l.units).findIndex((u) => u.id === it.unit.id)
                 return (
@@ -171,7 +183,7 @@ export default function PathPage() {
                         <span className="h-[3px] flex-1 rounded-full bg-go-border" />
                       </div>
                     )}
-                    <div className="mb-6 mt-3">
+                    <div className="mt-3 pb-6 pt-1" style={{ background: `linear-gradient(to bottom, transparent 0, ${tint} 40px)` }}>
                       <Ribbon tone={it.unit.comingSoon ? 'locked' : 'green'} sub={it.unit.description}>UNIDAD {unitIdx + 1} · {it.unit.title}</Ribbon>
                     </div>
                   </Fragment>
@@ -180,9 +192,10 @@ export default function PathPage() {
               const prev = items[i - 1]
               const showConnector = prev && prev.kind !== 'ribbon'
               const prevOffset = prev && prev.kind !== 'ribbon' ? prev.offset : 0
+              const prevDone = !!prev && ((prev.kind === 'lesson' && !!completed[prev.lesson.id]) || (prev.kind === 'chest' && !!completed[prev.afterLessonId]))
               return (
-                <Fragment key={it.key}>
-                  {showConnector && <Connector from={prevOffset} to={it.offset} />}
+                <div key={it.key} style={{ background: tint }}>
+                  {showConnector && <Connector from={prevOffset} to={it.offset} done={prevDone} />}
                   {it.kind === 'soon' && (
                     <NodeRow offset={it.offset}>
                       <ShieldNode state="locked" size={68} label="Próximamente" onClick={() => setSheet({ kind: 'soon' })}><LockIcon size={26} /></ShieldNode>
@@ -198,6 +211,7 @@ export default function PathPage() {
                     const active = it.lesson.id === activeId
                     const state = done ? 'done' : active ? 'active' : 'locked'
                     const level = levels.find((l) => l.units.some((u) => u.id === it.unit.id))
+                      const best = completed[it.lesson.id]?.bestAccuracy ?? 0
                     return (
                       <NodeRow offset={it.offset} innerRef={active ? activeRef : undefined}>
                         {active && (
@@ -216,10 +230,11 @@ export default function PathPage() {
                         <ShieldNode state={state} size={76} label={`${it.lesson.title}${done ? ', completada' : active ? ', actual' : ', bloqueada'}`} onClick={() => tapLesson(it.lesson, it.unit, it.indexInUnit)}>
                           {done ? <CheckIcon size={32} /> : active ? <StarIcon size={32} /> : <LockIcon size={28} />}
                         </ShieldNode>
+                        {done && <Stars count={best >= 95 ? 3 : best >= 85 ? 2 : 1} />}
                       </NodeRow>
                     )
                   })()}
-                </Fragment>
+                </div>
               )
             })}
             {allLessons.length > 0 && !activeId && (
@@ -293,13 +308,43 @@ function NodeRow({ offset, children, innerRef }: { offset: number; children: Rea
   )
 }
 
-function Connector({ from, to }: { from: number; to: number }) {
-  const dots = [0.2, 0.4, 0.6, 0.8].map((t) => ({ x: from + (to - from) * t, y: 4 + 12 * t }))
+/** Tramo de camino entre dos nodos: dorado si ya se recorrió, punteado gris si falta. */
+function Connector({ from, to, done }: { from: number; to: number; done: boolean }) {
+  const a = from * 0.75, b = to * 0.75
+  const d = `M ${a} -10 C ${a} 10, ${b} 10, ${b} 30`
   return (
-    <svg className="mx-auto block" width="320" height="20" viewBox="-160 0 320 20" aria-hidden>
-      {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r="3.5" fill="#D8CFCC" />)}
+    <svg className="mx-auto -my-[10px] block overflow-visible" width="320" height="20" viewBox="-160 0 320 20" aria-hidden>
+      {done ? (
+        <>
+          <path d={d} fill="none" stroke="#C9A02C" strokeWidth="10" strokeLinecap="round" opacity=".35" />
+          <path d={d} fill="none" stroke="#F2C94C" strokeWidth="6" strokeLinecap="round" />
+        </>
+      ) : (
+        <path d={d} fill="none" stroke="#D8CFCC" strokeWidth="6" strokeLinecap="round" strokeDasharray="0.1 12" />
+      )}
     </svg>
   )
+}
+
+/** Estrellas bajo una lección completada según la mejor precisión. */
+function Stars({ count }: { count: number }) {
+  return (
+    <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 gap-0.5" aria-label={`${count} de 3 estrellas`}>
+      {[0, 1, 2].map((i) => (
+        <span key={i} className={i < count ? 'text-go-xp drop-shadow-[0_1px_0_#C9A02C]' : 'text-go-border'} style={{ transform: i === 1 ? 'translateY(3px)' : undefined }}>
+          <StarIcon size={14} />
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/** Fondo suave alternado por unidad (verde, cálido) para que el mapa no sea un blanco plano. */
+const UNIT_TINTS = ['#F2F8F4', '#FBF7F2']
+function unitIndexOf(items: MapItem[], i: number): number {
+  let n = -1
+  for (let k = 0; k <= i; k++) if (items[k].kind === 'ribbon') n++
+  return Math.max(0, n)
 }
 
 function Chest({ state, onClick }: { state: 'locked' | 'ready' | 'open'; onClick: () => void }) {

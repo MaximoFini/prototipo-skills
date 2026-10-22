@@ -8,6 +8,7 @@ import { useApp } from '@/store/useApp'
 import { GOAL_LABELS } from '@/domain/rules'
 import type { DailyGoal, LevelId } from '@/domain/types'
 import { sfx } from '@/lib/sfx'
+import { loadSofiDemo } from '@/features/demo/sofiProfile'
 
 type Step = 'splash' | 'name' | 'level' | 'goal' | 'notif'
 const ORDER: Step[] = ['splash', 'name', 'level', 'goal', 'notif']
@@ -48,7 +49,7 @@ export default function OnboardingPage() {
     nav(level === 'test' ? '/placement' : '/', { replace: true })
   }
   const demo = () => {
-    useApp.getState().completeOnboarding({ name: 'Sofi', avatar: 'a3', level: 'A1', dailyGoal: 20 })
+    loadSofiDemo()
     nav('/', { replace: true })
   }
 
@@ -72,17 +73,29 @@ export default function OnboardingPage() {
         <AnimatePresence mode="wait" custom={dir} initial={false}>
           <motion.div key={step} custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: 'easeOut' }} className="absolute inset-0 flex flex-col">
             {step === 'splash' && (
-              <div className="flex h-full flex-col items-center justify-between px-6 text-center text-white" style={{ paddingTop: 'calc(48px + var(--safe-top))', paddingBottom: 'calc(24px + var(--safe-bottom))' }}>
-                <div className="flex flex-col items-center gap-6">
-                  <div className="rounded-3xl bg-white/10 p-5"><ShieldMark size={96} /></div>
-                  <div className="rounded-go bg-white px-5 py-3"><Lockup height={52} /></div>
-                  <p className="font-display text-[22px] font-bold italic">Building Skills</p>
-                  <p className="max-w-[260px] text-[15px] opacity-90">Tu inglés no se toma vacaciones. Practicá un ratito todos los días.</p>
+              <div className="relative flex h-full flex-col overflow-hidden px-6 text-center text-white" style={{ paddingTop: 'calc(40px + var(--safe-top))', paddingBottom: 'calc(20px + var(--safe-bottom))' }}>
+                {/* Fondo: luz suave arriba y escudo como marca de agua */}
+                <div aria-hidden className="pointer-events-none absolute inset-0">
+                  <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
+                  <ShieldMark size={260} mono="#ffffff" className="absolute -bottom-16 -right-20 rotate-[-12deg] opacity-[0.06]" />
                 </div>
-                <div className="w-full space-y-3">
-                  <Skilly mood="cheer" size={84} className="mx-auto" />
-                  <button type="button" onClick={next} className="btn-3d w-full border-[#C9A02C] bg-go-xp text-go-text">Empezar</button>
-                  <button type="button" onClick={demo} className="min-h-[44px] w-full text-[13px] font-medium text-white/80 underline-offset-2 hover:underline">Entrar con perfil demo</button>
+
+                <div className="relative flex justify-center">
+                  <div className="rounded-2xl bg-white px-5 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.18)]"><Lockup height={48} /></div>
+                </div>
+
+                <div className="relative flex flex-1 flex-col items-center justify-center">
+                  <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                    className="relative grid h-44 w-44 place-items-center rounded-full bg-white/10 ring-1 ring-white/15">
+                    <Skilly mood="cheer" size={120} />
+                  </motion.div>
+                  <h1 className="mt-7 font-display text-[28px] font-extrabold italic leading-tight">Building Skills</h1>
+                  <p className="mt-2 max-w-[270px] text-[15px] leading-relaxed text-white/85">Tu inglés no se toma vacaciones. Practicá un ratito todos los días.</p>
+                </div>
+
+                <div className="relative w-full space-y-2">
+                  <button type="button" onClick={next} className="btn-3d min-h-[52px] w-full border-[#C9A02C] bg-go-xp text-go-text">Empezar</button>
+                  <button type="button" onClick={demo} className="min-h-[48px] w-full rounded-go text-[14px] font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white">Entrar con perfil demo</button>
                 </div>
               </div>
             )}

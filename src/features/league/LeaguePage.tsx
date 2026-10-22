@@ -1,7 +1,8 @@
-import { memo, useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { memo, useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowDown, ArrowUp, Clock } from 'lucide-react'
-import { Avatar, Skilly } from '@/design'
+import { AnimatedNumber, Avatar, Skilly } from '@/design'
+import { sfx } from '@/lib/sfx'
 import { useApp } from '@/store/useApp'
 import { now } from '@/domain/clock'
 import type { LeagueEntry } from '@/domain/types'
@@ -36,27 +37,32 @@ function ZoneBand({ tone, children, icon }: { tone: 'up' | 'down' | 'neutral'; c
   )
 }
 
+/** [claro, oscuro] de cada medalla del podio. */
+const MEDALS: Record<number, [string, string]> = { 1: ['#FFE38A', '#D9A520'], 2: ['#EEF1F4', '#A9B3BC'], 3: ['#F2BE8A', '#B9733A'] }
+
 const Row = memo(function Row({ entry, pos, animate }: { entry: LeagueEntry; pos: number; animate: boolean }) {
-  const medal = pos === 1 ? '#F2C94C' : pos === 2 ? '#C9D0D6' : pos === 3 ? '#D9985A' : null
+  const medal = MEDALS[pos]
   return (
     <motion.div
       role="listitem"
       layout={animate ? 'position' : false}
       transition={{ type: 'spring', damping: 26, stiffness: 320 }}
-      className={`flex items-center gap-3 px-4 py-2.5 ${entry.isUser ? 'border-y-2 border-go-primary bg-go-primary-tint' : 'border-b border-go-border bg-white'}`}
+      className={`relative flex items-center gap-3 px-4 py-2.5 ${entry.isUser ? 'z-[1] border-y-2 border-go-primary bg-go-primary-tint shadow-[0_4px_12px_rgba(0,82,46,0.15)]' : 'border-b border-go-border bg-white'}`}
       aria-label={`Puesto ${pos}, ${entry.name}, ${entry.xp} XP${entry.isUser ? ', vos' : ''}`}
     >
+      {pos <= PROMOTE_COUNT && !entry.isUser && <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-go-primary/25" />}
       <span
-        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full font-display text-[15px] font-extrabold ${medal ? 'text-go-text' : 'text-go-muted'}`}
-        style={medal ? { background: medal } : undefined}
+        className={`relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full font-display text-[15px] font-extrabold ${medal ? 'text-go-text' : 'text-go-muted'}`}
+        style={medal ? { background: `radial-gradient(circle at 35% 30%, ${medal[0]}, ${medal[1]})`, boxShadow: `0 2px 0 ${medal[1]}` } : undefined}
       >
-        {pos}
+        {medal && animate && <span aria-hidden className="absolute inset-y-0 left-0 w-1/2 animate-[barShine_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent" style={{ animationDelay: `${pos * 0.4}s` }} />}
+        <span className="relative">{pos}</span>
       </span>
       <Avatar id={entry.avatar} name={entry.name} size={40} />
       <span className={`min-w-0 flex-1 truncate font-display text-[17px] font-extrabold ${entry.isUser ? 'text-go-primary' : 'text-go-text'}`}>
         {entry.isUser ? `${entry.name} (vos)` : entry.name}
       </span>
-      <span className="font-display text-[16px] font-extrabold tabular-nums text-go-text">{entry.xp} <span className="text-[12px] font-bold text-go-muted">XP</span></span>
+      <span className="font-display text-[16px] font-extrabold tabular-nums text-go-text">{entry.isUser ? <AnimatedNumber value={entry.xp} /> : entry.xp} <span className="text-[12px] font-bold text-go-muted">XP</span></span>
     </motion.div>
   )
 })
@@ -75,6 +81,28 @@ export default function LeaguePage() {
     return () => clearInterval(i)
   }, [])
 
+  const tier = LEAGUE_TIERS[league.tier]
+  const nextName = LEAGUE_TIERS[Math.min(MAX_TIER, league.tier + 1)].name
+  const standings = league.standings.map((e) => (e.isUser ? { ...e, xp: league.weekXp } : e))
+  const sorted = rank(standings)
+  const myPos = sorted.findIndex((e) => e.isUser) + 1
+  const cutXp = sorted[PROMOTE_COUNT - 1]?.xp ?? 0
+  const missing = Math.max(0, cutXp - league.weekXp + 1)
+
+  // Si el alumno sube de puesto mientras mira la tabla: festejo corto.
+  const prevPos = useRef(myPos)
+  const [climb, setClimb] = useState<number | null>(null)
+  useEffect(() => {
+    if (myPos > 0 && prevPos.current > 0 && myPos < prevPos.current) {
+      setClimb(myPos)
+      sfx.streak()
+      const t = window.setTimeout(() => setClimb(null), 2200)
+      prevPos.current = myPos
+      return () => window.clearTimeout(t)
+    }
+    prevPos.current = myPos
+  }, [myPos])
+
   const result = league.lastResult
   const showEnd = !!result && !isResultSeen(league.weekStart)
   // `resultVersion` fuerza a re-evaluar tras marcar como visto
@@ -92,16 +120,18 @@ export default function LeaguePage() {
     )
   }
 
-  const tier = LEAGUE_TIERS[league.tier]
-  const nextName = LEAGUE_TIERS[Math.min(MAX_TIER, league.tier + 1)].name
-  const standings = league.standings.map((e) => (e.isUser ? { ...e, xp: league.weekXp } : e))
-  const sorted = rank(standings)
-  const myPos = sorted.findIndex((e) => e.isUser) + 1
-  const cutXp = sorted[PROMOTE_COUNT - 1]?.xp ?? 0
-  const missing = Math.max(0, cutXp - league.weekXp + 1)
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="relative flex h-full flex-col bg-white">
+      <AnimatePresence>
+        {climb && (
+          <motion.div role="status" initial={{ y: -40, opacity: 0, scale: 0.9 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: -40, opacity: 0 }}
+            transition={{ type: 'spring', damping: 16, stiffness: 300 }}
+            className="absolute inset-x-6 top-3 z-30 flex items-center justify-center gap-2 rounded-full bg-go-primary px-4 py-2.5 font-display text-[16px] font-extrabold text-white shadow-lg" style={{ marginTop: 'var(--safe-top)' }}>
+            <ArrowUp size={18} strokeWidth={3} aria-hidden /> ¡Subiste al puesto #{climb}!
+          </motion.div>
+        )}
+      </AnimatePresence>
       <header className="shrink-0 border-b-2 border-go-border bg-go-surface px-4 pb-3 text-center" style={{ paddingTop: 'calc(14px + var(--safe-top))' }}>
         <div className="flex items-center justify-center gap-1.5" aria-label="Ligas">
           {LEAGUE_TIERS.map((t, i) => (
@@ -148,6 +178,13 @@ export default function LeaguePage() {
                   {pos === 1 && (league.tier < MAX_TIER ? <ZoneBand tone="up" icon="up">Zona de ascenso</ZoneBand> : <ZoneBand tone="up" icon="up">Top 10 · te quedás en Rubí</ZoneBand>)}
                   {pos === LEAGUE_SIZE - 4 && (league.tier > 0 ? <ZoneBand tone="down" icon="down">Zona de descenso</ZoneBand> : <ZoneBand tone="neutral">Últimos puestos</ZoneBand>)}
                   <Row entry={e} pos={pos} animate={!reduce} />
+                  {pos === PROMOTE_COUNT && league.tier < MAX_TIER && (
+                    <div className="flex items-center gap-2 px-4 py-1.5" aria-hidden>
+                      <span className="h-0 flex-1 border-t-2 border-dashed border-go-primary/40" />
+                      <span className="font-display text-[11px] font-extrabold uppercase tracking-[0.1em] text-go-primary">Línea de ascenso</span>
+                      <span className="h-0 flex-1 border-t-2 border-dashed border-go-primary/40" />
+                    </div>
+                  )}
                 </div>
               )
             })}

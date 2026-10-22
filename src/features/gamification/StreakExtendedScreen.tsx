@@ -22,9 +22,10 @@ const reduced = () => typeof window !== 'undefined' && !!window.matchMedia?.('(p
 
 export function streakMessage(n: number): { mood: SkillyMood; title: string; text: string } {
   if (n >= 21) return { mood: 'cheer', title: '¡21 días! Sos leyenda.', text: 'Tres semanas seguidas. Esto ya es un hábito de verdad.' }
-  if (n >= 14) return { mood: 'cheer', title: '¡Dos semanas seguidas!', text: 'Ya sos de los que no se rinden. Falta poquito para los 21.' }
-  if (n >= 7) return { mood: 'cheer', title: '¡Una semana entera!', text: 'Siete días sin faltar. Tu inglés lo nota.' }
-  if (n >= 3) return { mood: 'wink', title: '¡Tres días y contando!', text: 'Ya le agarraste el ritmo. No lo sueltes.' }
+  if (n >= 14) return { mood: 'cheer', title: '¡Dos semanas seguidas!', text: `Ya sos de los que no se rinden. Faltan ${21 - n} para los 21.` }
+  if (n > 7) return { mood: 'cheer', title: '¡Más de una semana!', text: `${n} días sin faltar. Próxima meta: 14 días.` }
+  if (n === 7) return { mood: 'cheer', title: '¡Una semana entera!', text: 'Siete días sin faltar. Tu inglés lo nota.' }
+  if (n >= 3) return { mood: 'wink', title: n === 3 ? '¡Tres días y contando!' : `¡${n} días y contando!`, text: 'Ya le agarraste el ritmo. No lo sueltes.' }
   if (n <= 1) return { mood: 'happy', title: '¡Prendiste la llama!', text: 'Primer día. Volvé mañana y la hacemos crecer.' }
   return { mood: 'happy', title: '¡Seguí así!', text: 'Un día más, una llama más grande.' }
 }

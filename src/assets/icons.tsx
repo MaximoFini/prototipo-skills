@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { SVGProps } from 'react'
 type P = { size?: number } & SVGProps<SVGSVGElement>
 
@@ -34,13 +35,44 @@ export function GemIcon({ size = 24, ...r }: P) {
     </svg>
   )
 }
+/** Cofre ilustrado: madera roja con bandas doradas, remaches y cerradura; abierto deja ver el brillo y las gemas. */
 export function ChestIcon({ size = 32, open, ...r }: P & { open?: boolean }) {
+  const id = useId().replace(/:/g, '')
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden {...r}>
-      <rect x="3" y="14" width="26" height="14" rx="2" fill="#B8252B" stroke="#8E1C21" strokeWidth="2" />
-      <path d={open ? 'M3 14 L5 5 H27 L29 14Z' : 'M3 14 Q3 6 16 6 Q29 6 29 14Z'} fill="#D2552B" stroke="#8E1C21" strokeWidth="2" strokeLinejoin="round" />
-      <rect x="13" y="13" width="6" height="7" rx="1" fill="#F2C94C" stroke="#C9A02C" strokeWidth="1.5" />
-      {open && <path d="M16 4 L16 1 M9 5 L7 2 M23 5 L25 2" stroke="#F2C94C" strokeWidth="2" strokeLinecap="round" />}
+      <defs>
+        <linearGradient id={`cb${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#D23A3F" /><stop offset="1" stopColor="#8E1C21" /></linearGradient>
+        <linearGradient id={`cl${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E0565A" /><stop offset="1" stopColor="#B8252B" /></linearGradient>
+        <radialGradient id={`cg${id}`} cx=".5" cy=".7" r=".6"><stop offset="0" stopColor="#FFF3B0" /><stop offset="1" stopColor="#F2C94C" stopOpacity="0" /></radialGradient>
+      </defs>
+      {open && <ellipse cx="16" cy="12" rx="14" ry="10" fill={`url(#cg${id})`} />}
+      {/* cuerpo */}
+      <rect x="3" y="14" width="26" height="15" rx="2.5" fill={`url(#cb${id})`} stroke="#6E1418" strokeWidth="1.5" />
+      <path d="M3.8 19 H28.2" stroke="#6E1418" strokeWidth=".8" opacity=".5" />
+      <path d="M3.8 24 H28.2" stroke="#6E1418" strokeWidth=".8" opacity=".5" />
+      <rect x="6" y="14" width="3" height="15" fill="#F2C94C" stroke="#C9A02C" strokeWidth=".8" />
+      <rect x="23" y="14" width="3" height="15" fill="#F2C94C" stroke="#C9A02C" strokeWidth=".8" />
+      {open && (
+        <>
+          <path d="M5 14 H27 L26 16 H6Z" fill="#3D0A0C" />
+          <path d="M11 14 L13 10.5 L15 14Z" fill="#4FA3F0" stroke="#1F5FA8" strokeWidth=".6" />
+          <path d="M16 14 L18.5 9.5 L21 14Z" fill="#9AD0FA" stroke="#1F5FA8" strokeWidth=".6" />
+          <circle cx="14.5" cy="12.8" r="1.4" fill="#F2C94C" stroke="#C9A02C" strokeWidth=".5" />
+        </>
+      )}
+      {/* tapa */}
+      <path d={open ? 'M3 13 L5.5 3.5 H26.5 L29 13Z' : 'M3 14.5 Q3 5.5 16 5.5 Q29 5.5 29 14.5Z'} fill={`url(#cl${id})`} stroke="#6E1418" strokeWidth="1.5" strokeLinejoin="round" />
+      {!open && <path d="M7 9.5 Q16 6.5 25 9.5" stroke="#fff" strokeWidth="1.2" opacity=".35" fill="none" strokeLinecap="round" />}
+      <path d={open ? 'M6 13 L8 3.6 H11 L9 13Z M21 13 L23 3.6 H26 L26 13Z' : 'M6 14.5 Q6 7 9 6.4 V14.5Z M23 6.4 Q26 7 26 14.5 H23Z'} fill="#F2C94C" stroke="#C9A02C" strokeWidth=".8" />
+      {/* cerradura */}
+      {!open && (
+        <>
+          <rect x="13" y="12" width="6" height="7.5" rx="1.5" fill="#F2C94C" stroke="#A8822A" strokeWidth="1" />
+          <circle cx="16" cy="15" r="1.1" fill="#5A4408" /><rect x="15.5" y="15" width="1" height="2.4" fill="#5A4408" />
+        </>
+      )}
+      {[[7.5, 27], [24.5, 27]].map(([x, y]) => <circle key={x} cx={x} cy={y} r=".7" fill="#C9A02C" />)}
+      {open && <path d="M16 3 V0.5 M8 4 L6.5 1.5 M24 4 L25.5 1.5" stroke="#F2C94C" strokeWidth="1.6" strokeLinecap="round" />}
     </svg>
   )
 }

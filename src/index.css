@@ -33,7 +33,23 @@ button { font-family: inherit; }
   .btn-3d:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 1px; }
   .card-go { @apply rounded-go border-2 border-go-border bg-white; }
   .scroll-y { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  /* Dentro del teléfono no se ven barras de scroll (como en una app nativa). */
+  #phone-root, #phone-root * { scrollbar-width: none; }
+  #phone-root ::-webkit-scrollbar, #phone-root::-webkit-scrollbar { display: none; }
+  .skeleton-shimmer {
+    background-image: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.75) 50%, transparent 80%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.3s linear infinite;
+  }
 }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes shimmer { from { background-position: 150% 0 } to { background-position: -50% 0 } }
+@keyframes hop { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+@keyframes hopShadow { 0%,100% { transform: scaleX(1); opacity: .9 } 50% { transform: scaleX(.6); opacity: .4 } }
+@keyframes flicker { 0%,100% { transform: scale(1) skewX(0) } 25% { transform: scale(1.06,.96) skewX(-3deg) } 50% { transform: scale(.97,1.05) skewX(2deg) } 75% { transform: scale(1.04,.98) skewX(-1deg) } }
+@keyframes ripple { from { transform: scale(.85); opacity: .55 } to { transform: scale(1.6); opacity: 0 } }
+@keyframes barShine { from { transform: translateX(-120%) } to { transform: translateX(320%) } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
