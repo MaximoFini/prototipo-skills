@@ -192,10 +192,13 @@ export default function PathPage() {
               const prev = items[i - 1]
               const showConnector = prev && prev.kind !== 'ribbon'
               const prevOffset = prev && prev.kind !== 'ribbon' ? prev.offset : 0
+              const isActive = it.kind === 'lesson' && it.lesson.id === activeId
               const prevDone = !!prev && ((prev.kind === 'lesson' && !!completed[prev.lesson.id]) || (prev.kind === 'chest' && !!completed[prev.afterLessonId]))
               return (
                 <div key={it.key} style={{ background: tint }}>
-                  {showConnector && <Connector from={prevOffset} to={it.offset} done={prevDone} />}
+                  {/* Skilly + globito son más altos que el nodo: se le da aire arriba a la lección actual para que no tape la anterior. */}
+                  {showConnector && <Connector from={prevOffset} to={it.offset} done={prevDone} height={20 + (isActive ? SKILLY_ROOM : 0)} />}
+                  {!showConnector && isActive && <div style={{ height: SKILLY_ROOM }} />}
                   {it.kind === 'soon' && (
                     <NodeRow offset={it.offset}>
                       <ShieldNode state="locked" size={68} label="Próximamente" onClick={() => setSheet({ kind: 'soon' })}><LockIcon size={26} /></ShieldNode>
@@ -309,11 +312,15 @@ function NodeRow({ offset, children, innerRef }: { offset: number; children: Rea
 }
 
 /** Tramo de camino entre dos nodos: dorado si ya se recorrió, punteado gris si falta. */
-function Connector({ from, to, done }: { from: number; to: number; done: boolean }) {
+/** Alto extra antes de la lección actual (lo que Skilly y su globito sobresalen del nodo). */
+const SKILLY_ROOM = 58
+
+function Connector({ from, to, done, height = 20 }: { from: number; to: number; done: boolean; height?: number }) {
   const a = from * 0.75, b = to * 0.75
-  const d = `M ${a} -10 C ${a} 10, ${b} 10, ${b} 30`
+  const mid = height / 2
+  const d = `M ${a} -10 C ${a} ${mid}, ${b} ${mid}, ${b} ${height + 10}`
   return (
-    <svg className="mx-auto -my-[10px] block overflow-visible" width="320" height="20" viewBox="-160 0 320 20" aria-hidden>
+    <svg className="mx-auto -my-[10px] block overflow-visible" width="320" height={height} viewBox={`-160 0 320 ${height}`} aria-hidden>
       {done ? (
         <>
           <path d={d} fill="none" stroke="#C9A02C" strokeWidth="10" strokeLinecap="round" opacity=".35" />
